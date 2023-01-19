@@ -21,34 +21,38 @@
  * @param y
  * @return
  */
-int mouseMove(int x, int y)
+int mouseMove(Display *display, Window *root, int x, int y)
 {
-	Display *displayMain = XOpenDisplay(NULL);
-
-	if (displayMain == NULL)
+	if (XWarpPointer(display, None, *root, 0, 0, 0, 0, x, y) == BadWindow)
 	{
-		printf("No display found.\n");
 		return 1;
 	}
-
-	Window root = XRootWindow(displayMain, 0);
-
-	XWarpPointer(displayMain, None, root, 0, 0, 0, 0, x, y);
-
-	XCloseDisplay(displayMain);
+	XFlush(display);
+	// XSync(display, False);
 
 	return 0;
 }
 
 int main()
 {
+	Display *display = XOpenDisplay(NULL);
+	if (display == NULL)
+	{
+		printf("No display found.\n");
+		return 1;
+	}
+
+	Window root = XRootWindow(display, 0);
+
 	for (unsigned int i = 200; i < 1000; i += 15)
 	{
-		if (mouseMove(i, i) == 1)
+		if (mouseMove(display, &root, i, i) == 1)
 		{
+			XCloseDisplay(display);
 			return 1;
 		}
 		sleep(1);
 	}
+	XCloseDisplay(display);
 	return 0;
 }
