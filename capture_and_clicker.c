@@ -9,8 +9,6 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/XTest.h>
 
-#define NEEDLE_LENGTH 16
-
 /**
  * @brief
  *
@@ -46,25 +44,8 @@ int mouseMove(Display *display, Window *root, int x, int y);
  */
 int main()
 {
-	// Content of the red rectangle in the capture_and_clicker.bmp
-	static PIXEL line[NEEDLE_LENGTH] = {
-		{0x00, 0x42, 0xa5},
-		{0x00, 0x44, 0xaa},
-		{0x00, 0x44, 0xaa},
-		{0xcf, 0xdc, 0xef},
-		{0xff, 0xff, 0xff},
-		{0xff, 0xff, 0xff},
-		{0xff, 0xff, 0xff},
-		{0xff, 0xff, 0xff},
-		{0xff, 0xff, 0xff},
-		{0xff, 0xff, 0xff},
-		{0xff, 0xff, 0xff},
-		{0xff, 0xff, 0xff},
-		{0x77, 0x9b, 0xd1},
-		{0x00, 0x44, 0xaa},
-		{0x00, 0x44, 0xaa},
-		{0x00, 0x42, 0xa5},
-	};
+	BITMAP bitmap = {};
+	readFile(&bitmap, "line.bmp");
 
 	Display *display = XOpenDisplay(NULL);
 	if (display == NULL)
@@ -86,12 +67,14 @@ int main()
 		for (int x = 0; x < img->width; x++)
 		{
 			unsigned long pixel = XGetPixel(img, x, y);
-			if (comparePixels(img, line[matched], pixel))
+			if (comparePixels(img, bitmap.data[matched], pixel))
 			{
-				if (++matched == NEEDLE_LENGTH)
+				if (++matched == bitmap.size)
 				{
-					printf("Everything found!\n");
-					mouseMove(display, &root, x, y);
+					// For some reason it was clicking outside.
+					// bitmap.width is solving it to some degree,
+					// but it looks still way too off.
+					mouseMove(display, &root, x - bitmap.width, y);
 
 					XTestFakeButtonEvent(display, Button1, True, 0);
 					XTestFakeButtonEvent(display, Button1, False, 0);
