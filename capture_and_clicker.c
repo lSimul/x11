@@ -78,9 +78,7 @@ int main()
 
 					XTestFakeButtonEvent(display, Button1, True, 0);
 					XTestFakeButtonEvent(display, Button1, False, 0);
-
-					XCloseDisplay(display);
-					return 0;
+					goto END;
 				}
 			}
 			else
@@ -90,6 +88,7 @@ int main()
 		}
 	}
 
+END:
 	XCloseDisplay(display);
 	return 0;
 }
