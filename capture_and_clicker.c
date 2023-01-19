@@ -1,3 +1,5 @@
+#include "pixel.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -7,13 +9,6 @@
 #include <X11/extensions/XTest.h>
 
 #define NEEDLE_LENGTH 16
-
-typedef struct pixel
-{
-	unsigned char red;
-	unsigned char green;
-	unsigned char blue;
-} PIXEL;
 
 static inline int comparePixels(XImage *img, PIXEL reference, unsigned long read);
 

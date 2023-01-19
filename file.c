@@ -1,12 +1,7 @@
+#include "pixel.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef struct pixel
-{
-	unsigned char red;
-	unsigned char green;
-	unsigned char blue;
-} PIXEL;
 
 typedef struct bitmap
 {
