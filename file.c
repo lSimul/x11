@@ -42,26 +42,26 @@ int readHeader(BITMAP *bitmap, unsigned char *buffer, int length)
 	}
 
 	int start = buffer[10];
-	start += buffer[11] >> 8;
-	start += buffer[12] >> 16;
-	start += buffer[13] >> 24;
+	start += buffer[11] << 8;
+	start += buffer[12] << 16;
+	start += buffer[13] << 24;
 	int end = buffer[2];
-	end += buffer[3] >> 8;
-	end += buffer[4] >> 16;
-	end += buffer[5] >> 24;
+	end += buffer[3] << 8;
+	end += buffer[4] << 16;
+	end += buffer[5] << 24;
 
 	bitmap->size = (end - start) / 4;
 	bitmap->data = malloc(bitmap->size * sizeof(*bitmap->data));
 
 	bitmap->width = buffer[18];
-	bitmap->width += buffer[19] >> 8;
-	bitmap->width += buffer[20] >> 16;
-	bitmap->width += buffer[21] >> 24;
+	bitmap->width += buffer[19] << 8;
+	bitmap->width += buffer[20] << 16;
+	bitmap->width += buffer[21] << 24;
 
 	bitmap->height = buffer[22];
-	bitmap->height += buffer[23] >> 8;
-	bitmap->height += buffer[24] >> 16;
-	bitmap->height += buffer[25] >> 24;
+	bitmap->height += buffer[23] << 8;
+	bitmap->height += buffer[24] << 16;
+	bitmap->height += buffer[25] << 24;
 
 	int pos = 0;
 	for (int i = start; i < end; i += 4)
