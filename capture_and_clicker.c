@@ -1,4 +1,5 @@
-#include "pixel.h"
+// Contains pixel.h, too
+#include "file.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,8 +11,25 @@
 
 #define NEEDLE_LENGTH 16
 
+/**
+ * @brief
+ *
+ * @param img
+ * @param reference
+ * @param read
+ * @return int
+ */
 static inline int comparePixels(XImage *img, PIXEL reference, unsigned long read);
 
+/**
+ * @brief
+ *
+ * @param display
+ * @param root
+ * @param x
+ * @param y
+ * @return int
+ */
 int mouseMove(Display *display, Window *root, int x, int y);
 
 /**

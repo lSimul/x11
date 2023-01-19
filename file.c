@@ -1,23 +1,13 @@
-#include "pixel.h"
+#include "file.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct bitmap
-{
-	int size;
-	int width;
-	int height;
-	PIXEL *data;
-} BITMAP;
-
-int readHeader(BITMAP *bitmap, unsigned char *buffer, int length);
-
 // (Probably) casual bitmap format. 32 bits, like GIMP likes it from the start
 // 24 bit and the non-fill would be better, but no need, the format is that easy.
-int main()
+int readFile(BITMAP *bitmap, const char *file)
 {
-	FILE *f = fopen("line.bmp", "rb");
+	FILE *f = fopen(file, "rb");
 	if (f == NULL)
 	{
 		return 1;
@@ -31,8 +21,7 @@ int main()
 	fread(buffer, length, 1, f);
 	fclose(f);
 
-	BITMAP bitmap = {};
-	if (readHeader(&bitmap, buffer, length))
+	if (readHeader(bitmap, buffer, length))
 	{
 		return 1;
 	}
