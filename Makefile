@@ -1,7 +1,10 @@
 C = gcc
 LIBS = -lX11
 
-all: presskey clicker capture capture_and_clicker
+all: presskey clicker capture capture_and_clicker file
+
+file: file.c
+	$(C) $^ -o $@
 
 clicker: clicker.c
 	$(C) $^ $(LIBS) -o $@
