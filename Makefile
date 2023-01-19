@@ -1,5 +1,10 @@
 C = gcc
 LIBS = -lX11
 
-all: main.c
-	$(C) $^ $(LIBS)
+all: presskey clicker
+
+clicker: main.c
+	$(C) $^ $(LIBS) -o $@
+
+presskey: presskey.c
+	$(C) $^ $(LIBS) -lXtst -o $@
