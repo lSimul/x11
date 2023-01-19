@@ -3,7 +3,7 @@ LIBS = -lX11
 
 all: presskey clicker capture
 
-clicker: main.c
+clicker: clicker.c
 	$(C) $^ $(LIBS) -o $@
 
 capture: capture.c
