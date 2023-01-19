@@ -54,13 +54,12 @@ int main()
 		return 1;
 	}
 
-	Window root = XRootWindow(display, 0);
+	Window root = XDefaultRootWindow(display);
 
 	XWindowAttributes attributes;
 	XGetWindowAttributes(display, root, &attributes);
 
 	XImage *img = XGetImage(display, root, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
-
 	int matched = 0;
 	for (int y = 0; y < img->height; y++)
 	{
@@ -71,13 +70,14 @@ int main()
 			{
 				if (++matched == bitmap.size)
 				{
-					// For some reason it was clicking outside.
-					// bitmap.width is solving it to some degree,
-					// but it looks still way too off.
-					mouseMove(display, &root, x - bitmap.width, y);
+					mouseMove(display, &root, x, y);
 
 					XTestFakeButtonEvent(display, Button1, True, 0);
 					XTestFakeButtonEvent(display, Button1, False, 0);
+
+
+					XFlush(display);
+					XSync(display, False);
 					goto END;
 				}
 			}
@@ -89,6 +89,52 @@ int main()
 	}
 
 END:
+
+	while (XPending(display))
+	{
+		sleep(1);
+	}
+	// I need active waiting for some reason.
+	sleep(1);
+	if (readFile(&bitmap, "terminal.bmp"))
+	{
+		printf("fail\n");
+	}
+
+	img = XGetImage(display, root, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
+
+	matched = 0;
+	for (int y = 0; y < img->height; y++)
+	{
+		for (int x = 0; x < img->width; x++)
+		{
+			unsigned long pixel = XGetPixel(img, x, y);
+			if (comparePixels(img, bitmap.data[matched], pixel))
+			{
+				// printf("%d\n", matched + 1);
+				if (++matched == bitmap.size)
+				{
+					// For some reason it was clicking outside.
+					// bitmap.width is solving it to some degree,
+					// but it looks still way too off.
+					mouseMove(display, &root, x - bitmap.width, y);
+
+					XTestFakeButtonEvent(display, Button1, True, 0);
+					XTestFakeButtonEvent(display, Button1, False, 0);
+
+					XFlush(display);
+					XSync(display, False);
+
+					return 0;
+				}
+			}
+			else
+			{
+				matched = 0;
+			}
+		}
+	}
+
 	XCloseDisplay(display);
 	return 0;
 }

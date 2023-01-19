@@ -69,6 +69,7 @@ int readHeader(BITMAP *bitmap, unsigned char *buffer, int length)
 		bitmap->data[pos].red = buffer[i + 2];
 		bitmap->data[pos].green = buffer[i + 1];
 		bitmap->data[pos].blue = buffer[i];
+		pos++;
 	}
 
 	return 0;
