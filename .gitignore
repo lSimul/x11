@@ -1,5 +1,4 @@
 *.o
-presskey
 capture_and_clicker
 command_reader
 _*

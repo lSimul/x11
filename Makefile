@@ -1,10 +1,10 @@
 C = gcc
 LIBS = -lX11
 
-all: presskey capture_and_clicker command_reader
+all: capture_and_clicker command_reader
 
-command_reader: command_reader.c grammer.o file.o string.o command.o token.o
-	$(C) $^ -o $@
+command_reader: command_reader.c grammer.o file.o string.o command.o token.o keys.o
+	$(C) $^ $(LIBS) -lXtst -o $@
 
 grammer.o: grammer.c grammer.h
 	$(C) $< -c -o $@
@@ -27,8 +27,8 @@ movement.o: movement.c movement.h
 capture_and_clicker: capture_and_clicker.c file.o movement.o
 	$(C) $^ $(LIBS) -lXtst -o $@
 
-presskey: presskey.c
-	$(C) $^ $(LIBS) -lXtst -o $@
+keys.o: keys.c keys.h
+	$(C) $< -c -o $@
 
 clean:
 	rm -rf *.o
