@@ -101,6 +101,18 @@ int toToken(READER *reader, TOKEN *token);
 void textToType(TOKEN *token);
 
 /**
+ * @brief Check, if the command is really meaningful.
+ *
+ * Grammer is really simple. Goal is just to check the ammount
+ * of commands, sequence of types. No priority, associations,
+ * this is really just a simple list to-do things as a text.
+ *
+ * @param c
+ * @return int 1 if there is a mistake, 0 otherwise
+ */
+int grammerCheck(COMMAND *c);
+
+/**
  * @brief
  *
  * @param token
@@ -160,6 +172,11 @@ int main()
 	c = root;
 	while (c != NULL)
 	{
+		if (grammerCheck(c))
+		{
+			printf("There is something wrong with this command.\n");
+		}
+
 		for (int i = 0; i < c->length; i++)
 		{
 			printToken(&c->tokens[i]);
@@ -279,6 +296,69 @@ void textToType(TOKEN *token)
 	{
 		token->type = CLICK;
 	}
+}
+
+int grammerCheck(COMMAND *c)
+{
+	// Edge case caused by hungry addition of the
+	// next command.
+	// NOOP should be fine, atlast for now.
+	if (c->length <= 0)
+	{
+		return 0;
+	}
+	TOKEN t = c->tokens[0];
+	if (t.type == PRESS)
+	{
+		if (c->length != 3)
+		{
+			return 1;
+		}
+		t = c->tokens[1];
+		if (t.type != SEQUENCE && t.type != T_COMMAND)
+		{
+			return 1;
+		}
+		if (c->tokens[2].type != TEXT)
+		{
+			return 1;
+		}
+	}
+	else if (t.type == FIND)
+	{
+		if (c->length != 2)
+		{
+			return 1;
+		}
+		else if (c->tokens[1].type != TEXT)
+		{
+			return 1;
+		}
+	}
+	else if (t.type == MOVE)
+	{
+		if (c->length != 2)
+		{
+			return 1;
+		}
+		else if (c->tokens[1].type != MOUSE)
+		{
+			return 1;
+		}
+	}
+	else if (t.type == CLICK)
+	{
+		if (c->length > 1)
+		{
+			return 1;
+		}
+	}
+	else
+	{
+		return 1;
+	}
+
+	return 0;
 }
 
 void printToken(TOKEN *t)
