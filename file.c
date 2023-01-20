@@ -1,8 +1,5 @@
 #include "file.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 // (Probably) casual bitmap format. 32 bits, like GIMP likes it from the start
 // 24 bit and the non-fill would be better, but no need, the format is that easy.
 int readBitmap(BITMAP *bitmap, const char *file)
@@ -73,4 +70,50 @@ int parseBitmap(BITMAP *bitmap, unsigned char *buffer, int length)
 	}
 
 	return 0;
+}
+
+int openFile(READER *reader, const char *file)
+{
+	FILE *f = fopen(file, "r");
+	if (f == NULL)
+	{
+		return 1;
+	}
+
+	reader->file = f;
+	reader->pos = 0;
+
+	reader->bufferSize = 0;
+	reader->bufferPos = 0;
+
+	fseek(f, 0, SEEK_END);
+	reader->size = ftell(f);
+	rewind(f);
+
+	return 0;
+}
+
+char getChar(READER *reader)
+{
+	if (reader->bufferPos < reader->bufferSize)
+	{
+		return reader->buffer[reader->bufferPos++];
+	}
+	if (reader->pos < reader->size)
+	{
+		unsigned int readBytes = CHUNK_SIZE;
+		if (reader->pos + CHUNK_SIZE > reader->size)
+		{
+			readBytes = reader->size - reader->pos;
+		}
+
+		reader->bufferSize = readBytes;
+		reader->bufferPos = 0;
+		fread(reader->buffer, readBytes * sizeof(*reader->buffer), sizeof(*reader->buffer), reader->file);
+		reader->pos += readBytes;
+
+		return reader->buffer[reader->bufferPos++];
+	}
+
+	return EOF;
 }

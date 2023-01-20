@@ -1,7 +1,10 @@
 C = gcc
 LIBS = -lX11
 
-all: presskey capture_and_clicker
+all: presskey capture_and_clicker grammer
+
+grammer: grammer.c file.o
+	$(C) $^ -o $@
 
 file.o: file.c file.h
 	$(C) $< -c -o $@

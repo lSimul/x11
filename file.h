@@ -1,5 +1,24 @@
 #include "pixel.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
+// Can be changed to any meaningful
+// value, number 10 is a nice testing
+// size, ensures that buffer will have
+// to be filled multiple times.
+#define CHUNK_SIZE 10
+
+typedef struct reader
+{
+	FILE *file;
+	long pos;
+	long size;
+	char buffer[CHUNK_SIZE];
+	unsigned int bufferSize;
+	unsigned int bufferPos;
+} READER;
+
 /**
  * @brief
  *
@@ -21,3 +40,20 @@ int readBitmap(BITMAP *bitmap, const char *file);
  * @return int
  */
 int parseBitmap(BITMAP *bitmap, unsigned char *buffer, int length);
+
+/**
+ * @brief
+ *
+ * @param reader
+ * @param file
+ * @return int
+ */
+int openFile(READER *reader, const char *file);
+
+/**
+ * @brief
+ *
+ * @param reader
+ * @return char
+ */
+char getChar(READER *reader);
