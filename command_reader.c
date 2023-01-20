@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // C_ stands for COMMAND.
 // `press` is also in the keys.h
@@ -117,7 +118,85 @@ void C_pressSequence(Display *display, COMMAND *command)
 	}
 }
 
+KeySym readSequenceToKeySym(const char read[5], int readCount);
+
 void C_pressCommand(Display *display, COMMAND *command)
 {
-	// TODO: Parse CTR to XK_Control_{L|R} etc.
+	EVENT *q = NULL;
+
+	// TODO: Ignoring upper bound, segmentation fault
+	// is possible.
+	char read[5];
+	int readCount = 0;
+
+	int i = 0;
+	STRING s = command->tokens[2].text;
+
+	// Very hungry parser, ignoring everything, what it does not like.
+	while (1)
+	{
+		printf("i:\t%d\n", i);
+		if (s.length == i)
+		{
+			if (readCount > 0)
+			{
+				int ks = readSequenceToKeySym(read, readCount);
+				if (ks > 0)
+				{
+					q = press(display, q, ks);
+				}
+			}
+			break;
+		}
+
+		char c = s.data[i];
+		if (c == '-')
+		{
+			if (readCount > 0)
+			{
+				int ks = readSequenceToKeySym(read, readCount);
+				if (ks > 0)
+				{
+					q = press(display, q, ks);
+				}
+				for (int j = 0; j < 5; j++)
+				{
+					read[j] = 0;
+				}
+				readCount = 0;
+			}
+		}
+		else if (c >= 'A' && c <= 'Z')
+		{
+			read[readCount++] = c;
+		}
+		i++;
+	}
+
+	if (q != NULL)
+	{
+		release(q);
+	}
+}
+
+KeySym readSequenceToKeySym(const char read[5], int readCount)
+{
+	if (readCount == 0)
+	{
+		return 0;
+	}
+	else if (readCount == 1)
+	{
+		return read[0];
+	}
+
+	if (strcmp(read, "CTR") == 0)
+	{
+		return XK_Control_L;
+	}
+	else if (strcmp(read, "ALT") == 0)
+	{
+		return XK_Alt_L;
+	}
+	return 0;
 }
