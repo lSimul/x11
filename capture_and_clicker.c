@@ -33,6 +33,20 @@ static inline int comparePixels(XImage *img, PIXEL reference, unsigned long read
 int mouseMove(Display *display, Window *root, int x, int y);
 
 /**
+ * @brief
+ *
+ * Inspiration for a mouse click comes from
+ * https://stackoverflow.com/questions/8767524/how-do-we-simulate-a-mouse-click-with-xlib-c
+ *
+ * @param display
+ * @param root
+ * @param x
+ * @param y
+ * @return int
+ */
+int moveAndClick(Display *display, Window *root, int x, int y);
+
+/**
  * Combination of capture.c and clicker.c
  *
  * Read screen and based on the sequence of pixels
@@ -40,9 +54,6 @@ int mouseMove(Display *display, Window *root, int x, int y);
  *
  * Crucial combination of some parts, these two operations will
  * be a backbone for everything I'll be doing later on.
- *
- * Plus for a mouse click https://stackoverflow.com/questions/8767524/how-do-we-simulate-a-mouse-click-with-xlib-c
- * was an essential part.
  */
 int main()
 {
@@ -82,13 +93,10 @@ int main()
 				{
 					if (++matched == bitmap.size)
 					{
-						mouseMove(display, &root, x, y);
-
-						XTestFakeButtonEvent(display, Button1, True, 0);
-						XTestFakeButtonEvent(display, Button1, False, 0);
-
-						XFlush(display);
-						XSync(display, False);
+						if (moveAndClick(display, &root, x, y))
+						{
+							goto NEXT;
+						}
 						success = 1;
 						goto NEXT;
 					}
@@ -132,12 +140,20 @@ static inline int comparePixels(XImage *img, PIXEL reference, unsigned long read
 
 int mouseMove(Display *display, Window *root, int x, int y)
 {
-	if (XWarpPointer(display, None, *root, 0, 0, 0, 0, x, y) == BadWindow)
+	return XWarpPointer(display, None, *root, 0, 0, 0, 0, x, y) == BadWindow;
+}
+
+int moveAndClick(Display *display, Window *root, int x, int y)
+{
+	if (mouseMove(display, root, x, y))
 	{
 		return 1;
 	}
+	XTestFakeButtonEvent(display, Button1, True, 0);
+	XTestFakeButtonEvent(display, Button1, False, 0);
+
 	XFlush(display);
-	// XSync(display, False);
+	XSync(display, False);
 
 	return 0;
 }
