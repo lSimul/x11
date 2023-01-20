@@ -1,82 +1,10 @@
+#include "command.h"
+#include "token.h"
 #include "file.h"
+
 #include "string.h"
 
-#include <string.h>
-
-typedef enum type
-{
-	EMPTY,
-
-	TEXT,
-
-	// "PRESS"
-	PRESS,
-
-	// "SEQUENCE"
-	SEQUENCE,
-
-	// COMMAND is used twice here, as a struct.
-	// "COMMAND",
-	T_COMMAND,
-
-	// "FIND"
-	FIND,
-
-	// "MOVE"
-	MOVE,
-
-	// "MOUSE"
-	MOUSE,
-
-	// "CLICK"
-	CLICK,
-
-	SEPARATOR,
-} TYPE;
-
 #define STARTING_SIZE 2
-
-typedef struct token
-{
-	TYPE type;
-
-	STRING text;
-} TOKEN;
-
-typedef struct command
-{
-	struct command *next;
-
-	int length;
-	int capacity;
-	TOKEN *tokens;
-} COMMAND;
-
-/**
- * @brief
- *
- * Command is allocated on the heap, because
- * they can be chained into the queue.
- * Queue is the most natural structure for the
- * execution of the commands.
- *
- * @return COMMAND*
- */
-COMMAND *newCommand();
-
-/**
- * @brief
- *
- * @param command
- */
-void enlargeCommands(COMMAND *command);
-
-/**
- * @brief
- *
- * @param token
- */
-void initToken(TOKEN *token);
 
 /**
  * @brief
@@ -86,13 +14,6 @@ void initToken(TOKEN *token);
  * @return int
  */
 int toToken(READER *reader, TOKEN *token);
-
-/**
- * @brief
- *
- * @param token
- */
-void textToType(TOKEN *token);
 
 /**
  * @brief Check, if the command is really meaningful.
@@ -105,13 +26,6 @@ void textToType(TOKEN *token);
  * @return int 1 if there is a mistake, 0 otherwise
  */
 int grammerCheck(COMMAND *c);
-
-/**
- * @brief
- *
- * @param token
- */
-void printToken(TOKEN *token);
 
 int main()
 {
@@ -165,40 +79,6 @@ int main()
 	}
 }
 
-COMMAND *newCommand()
-{
-	COMMAND *c = malloc(sizeof(*c));
-	c->next = NULL;
-	c->length = 0;
-	c->capacity = STARTING_SIZE;
-	c->tokens = malloc(STARTING_SIZE * sizeof(*c->tokens));
-
-	return c;
-}
-
-void enlargeCommands(COMMAND *command)
-{
-	TOKEN *tokens = malloc(command->capacity * 2 * sizeof(*tokens));
-	for (unsigned int i = 0; i < command->length; i++)
-	{
-		tokens[i] = command->tokens[i];
-	}
-	command->capacity *= 2;
-
-	command->tokens = tokens;
-}
-
-void initToken(TOKEN *token)
-{
-	token->type = EMPTY;
-
-	STRING s = {};
-	s.length = 0;
-	s.capacity = STARTING_SIZE;
-	s.data = malloc(STARTING_SIZE * sizeof(*s.data));
-	token->text = s;
-}
-
 int toToken(READER *reader, TOKEN *token)
 {
 	char c;
@@ -237,44 +117,6 @@ int toToken(READER *reader, TOKEN *token)
 		token->type = TEXT;
 	}
 	return 1;
-}
-
-void textToType(TOKEN *token)
-{
-	if (token->type != TEXT)
-	{
-		return;
-	}
-
-	const char *str = token->text.data;
-	if (strcmp(str, "PRESS") == 0)
-	{
-		token->type = PRESS;
-	}
-	else if (strcmp(str, "SEQUENCE") == 0)
-	{
-		token->type = SEQUENCE;
-	}
-	else if (strcmp(str, "COMMAND") == 0)
-	{
-		token->type = T_COMMAND;
-	}
-	else if (strcmp(str, "FIND") == 0)
-	{
-		token->type = FIND;
-	}
-	else if (strcmp(str, "MOVE") == 0)
-	{
-		token->type = MOVE;
-	}
-	else if (strcmp(str, "MOUSE") == 0)
-	{
-		token->type = MOUSE;
-	}
-	else if (strcmp(str, "CLICK") == 0)
-	{
-		token->type = CLICK;
-	}
 }
 
 int grammerCheck(COMMAND *c)
@@ -338,16 +180,4 @@ int grammerCheck(COMMAND *c)
 	}
 
 	return 0;
-}
-
-void printToken(TOKEN *t)
-{
-	if (t->type == TEXT)
-	{
-		printf("Unparsed text: %s\n", t->text.data);
-	}
-	else
-	{
-		printf("Command: %d\n", t->type);
-	}
 }
