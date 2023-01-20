@@ -61,6 +61,13 @@ typedef struct command
 /**
  * @brief
  *
+ * @return COMMAND*
+ */
+COMMAND *newCommand();
+
+/**
+ * @brief
+ *
  * @param command
  */
 void enlargeCommands(COMMAND *command);
@@ -115,12 +122,7 @@ int main()
 	READER r = {};
 	openFile(&r, "commands.txt");
 
-	COMMAND *c = malloc(sizeof(*c));
-	c->next = NULL;
-	c->length = 0;
-	c->capacity = STARTING_SIZE;
-	c->tokens = malloc(STARTING_SIZE * sizeof(*c->tokens));
-
+	COMMAND *c = newCommand();
 	COMMAND *root = c;
 
 	while (1)
@@ -137,12 +139,7 @@ int main()
 		{
 			if (c->length > 0)
 			{
-				COMMAND *newC = malloc(sizeof(*newC));
-				newC->next = NULL;
-				newC->length = 0;
-				newC->capacity = STARTING_SIZE;
-				newC->tokens = malloc(STARTING_SIZE * sizeof(*newC->tokens));
-
+				COMMAND *newC = newCommand();
 				c->next = newC;
 				c = newC;
 			}
@@ -165,6 +162,17 @@ int main()
 		printf("\n");
 		c = c->next;
 	}
+}
+
+COMMAND *newCommand()
+{
+	COMMAND *c = malloc(sizeof(*c));
+	c->next = NULL;
+	c->length = 0;
+	c->capacity = STARTING_SIZE;
+	c->tokens = malloc(STARTING_SIZE * sizeof(*c->tokens));
+
+	return c;
 }
 
 void enlargeCommands(COMMAND *command)
