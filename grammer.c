@@ -61,6 +61,11 @@ typedef struct command
 /**
  * @brief
  *
+ * Command is allocated on the heap, because
+ * they can be chained into the queue.
+ * Queue is the most natural structure for the
+ * execution of the commands.
+ *
  * @return COMMAND*
  */
 COMMAND *newCommand();
