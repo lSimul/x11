@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 // C_ stands for COMMAND.
 // `press` is also in the keys.h
@@ -80,6 +81,9 @@ void C_execute(Display *display, COMMAND *command)
 		}
 
 		command = command->next;
+		// TODO: Sleeps are really annoying, but they
+		// fix the problem.
+		sleep(1);
 	}
 }
 
@@ -135,7 +139,6 @@ void C_pressCommand(Display *display, COMMAND *command)
 	// Very hungry parser, ignoring everything, what it does not like.
 	while (1)
 	{
-		printf("i:\t%d\n", i);
 		if (s.length == i)
 		{
 			if (readCount > 0)
