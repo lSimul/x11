@@ -9,6 +9,8 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/XTest.h>
 
+#define STEP_COUNT 2
+
 /**
  * @brief
  *
@@ -45,7 +47,6 @@ int mouseMove(Display *display, Window *root, int x, int y);
 int main()
 {
 	BITMAP bitmap = {};
-	readFile(&bitmap, "line.bmp");
 
 	Display *display = XOpenDisplay(NULL);
 	if (display == NULL)
@@ -53,88 +54,69 @@ int main()
 		printf("No display found.\n");
 		return 1;
 	}
-
 	Window root = XDefaultRootWindow(display);
-
 	XWindowAttributes attributes;
 	XGetWindowAttributes(display, root, &attributes);
 
-	XImage *img = XGetImage(display, root, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
-	int matched = 0;
-	for (int y = 0; y < img->height; y++)
+	static const char *steps[STEP_COUNT] = {
+		"line.bmp",
+		"terminal.bmp",
+	};
+	for (int i = 0; i < STEP_COUNT; i++)
 	{
-		for (int x = 0; x < img->width; x++)
+		if (readFile(&bitmap, steps[i]))
 		{
-			unsigned long pixel = XGetPixel(img, x, y);
-			if (comparePixels(img, bitmap.data[matched], pixel))
+			printf("Fail while reading '%s'.\n", steps[i]);
+			return 1;
+		}
+
+		XImage *img = XGetImage(display, root, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
+		int matched = 0;
+		int success = 0;
+		for (int y = 0; y < img->height; y++)
+		{
+			for (int x = 0; x < img->width; x++)
 			{
-				if (++matched == bitmap.size)
+				unsigned long pixel = XGetPixel(img, x, y);
+				if (comparePixels(img, bitmap.data[matched], pixel))
 				{
-					mouseMove(display, &root, x, y);
+					if (++matched == bitmap.size)
+					{
+						mouseMove(display, &root, x, y);
 
-					XTestFakeButtonEvent(display, Button1, True, 0);
-					XTestFakeButtonEvent(display, Button1, False, 0);
+						XTestFakeButtonEvent(display, Button1, True, 0);
+						XTestFakeButtonEvent(display, Button1, False, 0);
 
-
-					XFlush(display);
-					XSync(display, False);
-					goto END;
+						XFlush(display);
+						XSync(display, False);
+						success = 1;
+						goto NEXT;
+					}
+				}
+				else
+				{
+					matched = 0;
 				}
 			}
-			else
-			{
-				matched = 0;
-			}
 		}
+	NEXT:
+		free(bitmap.data);
+
+		if (!success)
+		{
+			printf("Failed finding stuff in '%s'\n", steps[i]);
+			goto END;
+		}
+
+		while (XPending(display))
+		{
+			sleep(1);
+		}
+		// I need active waiting for some reason.
+		sleep(1);
 	}
 
 END:
-
-	while (XPending(display))
-	{
-		sleep(1);
-	}
-	// I need active waiting for some reason.
-	sleep(1);
-	if (readFile(&bitmap, "terminal.bmp"))
-	{
-		printf("fail\n");
-	}
-
-	img = XGetImage(display, root, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
-
-	matched = 0;
-	for (int y = 0; y < img->height; y++)
-	{
-		for (int x = 0; x < img->width; x++)
-		{
-			unsigned long pixel = XGetPixel(img, x, y);
-			if (comparePixels(img, bitmap.data[matched], pixel))
-			{
-				// printf("%d\n", matched + 1);
-				if (++matched == bitmap.size)
-				{
-					// For some reason it was clicking outside.
-					// bitmap.width is solving it to some degree,
-					// but it looks still way too off.
-					mouseMove(display, &root, x - bitmap.width, y);
-
-					XTestFakeButtonEvent(display, Button1, True, 0);
-					XTestFakeButtonEvent(display, Button1, False, 0);
-
-					XFlush(display);
-					XSync(display, False);
-
-					return 0;
-				}
-			}
-			else
-			{
-				matched = 0;
-			}
-		}
-	}
-
 	XCloseDisplay(display);
 	return 0;
 }
