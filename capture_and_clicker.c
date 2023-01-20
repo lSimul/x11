@@ -55,8 +55,8 @@ int main()
 	XGetWindowAttributes(display, root, &attributes);
 
 	static const char *steps[STEP_COUNT] = {
-		"line.bmp",
-		"terminal.bmp",
+		"images/line.bmp",
+		"images/terminal.bmp",
 	};
 	for (int i = 0; i < STEP_COUNT; i++)
 	{
