@@ -1,13 +1,5 @@
 #include "pixel.h"
 
-typedef struct bitmap
-{
-	int size;
-	int width;
-	int height;
-	PIXEL *data;
-} BITMAP;
-
 /**
  * @brief
  *
@@ -18,7 +10,7 @@ typedef struct bitmap
  * @param file
  * @return int
  */
-int readFile(BITMAP *bitmap, const char *file);
+int readBitmap(BITMAP *bitmap, const char *file);
 
 /**
  * @brief
@@ -28,4 +20,4 @@ int readFile(BITMAP *bitmap, const char *file);
  * @param length
  * @return int
  */
-int readHeader(BITMAP *bitmap, unsigned char *buffer, int length);
+int parseBitmap(BITMAP *bitmap, unsigned char *buffer, int length);

@@ -60,7 +60,7 @@ int main()
 	};
 	for (int i = 0; i < STEP_COUNT; i++)
 	{
-		if (readFile(&bitmap, steps[i]))
+		if (readBitmap(&bitmap, steps[i]))
 		{
 			printf("Fail while reading '%s'.\n", steps[i]);
 			return 1;

@@ -5,7 +5,7 @@
 
 // (Probably) casual bitmap format. 32 bits, like GIMP likes it from the start
 // 24 bit and the non-fill would be better, but no need, the format is that easy.
-int readFile(BITMAP *bitmap, const char *file)
+int readBitmap(BITMAP *bitmap, const char *file)
 {
 	FILE *f = fopen(file, "rb");
 	if (f == NULL)
@@ -21,7 +21,7 @@ int readFile(BITMAP *bitmap, const char *file)
 	fread(buffer, length, 1, f);
 	fclose(f);
 
-	if (readHeader(bitmap, buffer, length))
+	if (parseBitmap(bitmap, buffer, length))
 	{
 		return 1;
 	}
@@ -29,7 +29,7 @@ int readFile(BITMAP *bitmap, const char *file)
 	return 0;
 }
 
-int readHeader(BITMAP *bitmap, unsigned char *buffer, int length)
+int parseBitmap(BITMAP *bitmap, unsigned char *buffer, int length)
 {
 	if (length < 14)
 	{

@@ -8,4 +8,12 @@ typedef struct pixel
 	unsigned char blue;
 } PIXEL;
 
+typedef struct bitmap
+{
+	int size;
+	int width;
+	int height;
+	PIXEL *data;
+} BITMAP;
+
 #endif
