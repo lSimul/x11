@@ -21,7 +21,7 @@ typedef struct string
 {
 	int length;
 	int capacity;
-	char *text;
+	char *data;
 } STRING;
 
 typedef struct token
@@ -109,7 +109,7 @@ int main()
 
 	for (int i = 0; i < c.length; i++)
 	{
-		printf("%s\n", c.tokens[i].text.text);
+		printf("%s\n", c.tokens[i].text.data);
 	}
 }
 
@@ -132,7 +132,7 @@ void initToken(TOKEN *token)
 	STRING s = {};
 	s.length = 0;
 	s.capacity = STARTING_SIZE;
-	s.text = malloc(STARTING_SIZE * sizeof(*s.text));
+	s.data = malloc(STARTING_SIZE * sizeof(*s.data));
 	token->text = s;
 }
 
@@ -169,7 +169,7 @@ void textToType(TOKEN *token)
 
 void appendToString(STRING *s, char c)
 {
-	s->text[s->length++] = c;
+	s->data[s->length++] = c;
 
 	if (s->capacity == s->length)
 	{
@@ -179,12 +179,12 @@ void appendToString(STRING *s, char c)
 
 void enlargeString(STRING *string)
 {
-	char *text = malloc(string->capacity * 2 * sizeof(*text));
+	char *data = malloc(string->capacity * 2 * sizeof(*data));
 	for (unsigned int i = 0; i < string->length; i++)
 	{
-		text[i] = string->text[i];
+		data[i] = string->data[i];
 	}
 	string->capacity *= 2;
 
-	string->text = text;
+	string->data = data;
 }
