@@ -32,3 +32,6 @@ presskey: presskey.c
 
 clean:
 	rm -rf *.o
+
+doc:
+	doxygen Doxyfile
