@@ -1,5 +1,7 @@
 #include "movement.h"
 
+#include <X11/extensions/XTest.h>
+
 int mouseMove(Display *display, Window *root, int x, int y)
 {
 	return XWarpPointer(display, None, *root, 0, 0, 0, 0, x, y) == BadWindow;
