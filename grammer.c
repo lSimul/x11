@@ -1,36 +1,12 @@
-#include "command.h"
-#include "token.h"
-#include "file.h"
+#include "grammer.h"
 
-#include "string.h"
-
-#define STARTING_SIZE 2
-
-/**
- * @brief
- *
- * @param reader
- * @param token
- * @return int
- */
-int toToken(READER *reader, TOKEN *token);
-
-/**
- * @brief Check, if the command is really meaningful.
- *
- * Grammer is really simple. Goal is just to check the ammount
- * of commands, sequence of types. No priority, associations,
- * this is really just a simple list to-do things as a text.
- *
- * @param c
- * @return int 1 if there is a mistake, 0 otherwise
- */
-int grammerCheck(COMMAND *c);
-
-int main()
+int fileToCommands(const char *file, COMMAND **command)
 {
 	READER r = {};
-	openFile(&r, "commands.txt");
+	if (openFile(&r, file))
+	{
+		return 1;
+	}
 
 	COMMAND *c = newCommand();
 	COMMAND *root = c;
@@ -68,15 +44,21 @@ int main()
 		if (grammerCheck(c))
 		{
 			printf("There is something wrong with this command.\n");
+			return 1;
 		}
 
-		for (int i = 0; i < c->length; i++)
+		if (c->next != NULL && c->next->length == 0)
 		{
-			printToken(&c->tokens[i]);
+			free(c->next->tokens);
+			free(c->next);
+			c->next = NULL;
 		}
-		printf("\n");
 		c = c->next;
 	}
+
+	*command = root;
+
+	return 0;
 }
 
 int toToken(READER *reader, TOKEN *token)

@@ -1,10 +1,13 @@
 C = gcc
 LIBS = -lX11
 
-all: presskey capture_and_clicker grammer
+all: presskey capture_and_clicker command_reader
 
-grammer: grammer.c file.o string.o command.o token.o
+command_reader: command_reader.c grammer.o file.o string.o command.o token.o
 	$(C) $^ -o $@
+
+grammer.o: grammer.c grammer.h
+	$(C) $< -c -o $@
 
 command.o: command.c command.h
 	$(C) $< -c -o $@

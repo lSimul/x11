@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef _FILE_H_
+#define _FILE_H_
+
 // Can be changed to any meaningful
 // value, number 10 is a nice testing
 // size, ensures that buffer will have
@@ -74,3 +77,5 @@ char getChar(READER *reader);
  * @param c
  */
 void ungetChar(READER *reader, char c);
+
+#endif
