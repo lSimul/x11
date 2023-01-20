@@ -8,7 +8,7 @@ typedef enum type
 
 	PRESS,
 	SEQUENCE,
-	COMMAND,
+	// COMMAND,
 	FIND,
 	MOVE,
 	MOUSE,
@@ -25,6 +25,13 @@ typedef struct token
 	int capacity;
 	char *text;
 } TOKEN;
+
+typedef struct command
+{
+	int length;
+	int capacity;
+	TOKEN *tokens;
+} COMMAND;
 
 /**
  * @brief
@@ -54,13 +61,29 @@ int main()
 	READER r = {};
 	openFile(&r, "commands.txt");
 
-	TOKEN t = {};
-	initToken(&t);
-	while (!toToken(&r, &t))
+	COMMAND c = {};
+	c.length = 0;
+	c.capacity = STARTING_SIZE;
+	c.tokens = malloc(STARTING_SIZE * sizeof(*c.tokens));
+
+	while (1)
 	{
-		printf("%s\n", t.text);
-		t.length = 0;
-		t.type = EMPTY;
+		initToken(&(c.tokens[c.length]));
+		if (toToken(&r, &(c.tokens[c.length])))
+		{
+			break;
+		}
+
+		// TODO: Enlarge.
+		if (++c.length == c.capacity)
+		{
+			break;
+		}
+	}
+
+	for (int i = 0; i < c.length; i++)
+	{
+		printf("%s\n", c.tokens[i].text);
 	}
 }
 
