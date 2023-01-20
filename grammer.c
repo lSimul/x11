@@ -13,6 +13,7 @@ typedef enum type
 	MOVE,
 	MOUSE,
 	CLICK,
+	SEPARATOR,
 } TYPE;
 
 #define STARTING_SIZE 2
@@ -101,6 +102,14 @@ int main()
 			break;
 		}
 
+		textToType(&(c.tokens[c.length]));
+
+		if (c.tokens[c.length].type == SEPARATOR)
+		{
+			printf("Whole command parsed.\n");
+			break;
+		}
+
 		if (++c.length == c.capacity)
 		{
 			enlargeCommands(&c);
@@ -147,7 +156,21 @@ int toToken(READER *reader, TOKEN *token)
 			return token->type == EMPTY;
 		}
 
-		if (c == ' ' || c == '\n')
+		if (c == '\n')
+		{
+			if (token->type == EMPTY)
+			{
+				token->type = SEPARATOR;
+				return 0;
+			}
+			else
+			{
+				ungetChar(reader, c);
+				return 0;
+			}
+		}
+
+		if (c == ' ')
 		{
 			if (token->type == EMPTY)
 			{
@@ -164,6 +187,10 @@ int toToken(READER *reader, TOKEN *token)
 
 void textToType(TOKEN *token)
 {
+	if (token->type != TEXT)
+	{
+		return;
+	}
 	token->type = TEXT;
 }
 

@@ -82,6 +82,7 @@ int openFile(READER *reader, const char *file)
 
 	reader->file = f;
 	reader->pos = 0;
+	reader->dangling = 0;
 
 	reader->bufferSize = 0;
 	reader->bufferPos = 0;
@@ -95,6 +96,13 @@ int openFile(READER *reader, const char *file)
 
 char getChar(READER *reader)
 {
+	if (reader->dangling != 0)
+	{
+		char c = reader->dangling;
+		reader->dangling = 0;
+		return c;
+	}
+
 	if (reader->bufferPos < reader->bufferSize)
 	{
 		return reader->buffer[reader->bufferPos++];
@@ -116,4 +124,10 @@ char getChar(READER *reader)
 	}
 
 	return EOF;
+}
+
+
+void ungetChar(READER *reader, char c)
+{
+	reader->dangling = c;
 }

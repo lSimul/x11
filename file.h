@@ -12,6 +12,7 @@
 typedef struct reader
 {
 	FILE *file;
+	char dangling;
 	long pos;
 	long size;
 	char buffer[CHUNK_SIZE];
@@ -57,3 +58,19 @@ int openFile(READER *reader, const char *file);
  * @return char
  */
 char getChar(READER *reader);
+
+/**
+ * @brief Return char back to the reader.
+ *
+ * Finding newline while reading can change the outcome, char
+ * has to be stored somewhere, so it can be read again.
+ *
+ * Right now it is used only for newlines (symbol of the fact that
+ * command is ending), later on it can be used for quotes etc.
+ *
+ * Multiple ungets do not really work, it is not a stack.
+ *
+ * @param reader
+ * @param c
+ */
+void ungetChar(READER *reader, char c);
