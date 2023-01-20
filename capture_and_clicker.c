@@ -1,5 +1,6 @@
 // Contains pixel.h, too
 #include "file.h"
+#include "movement.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,31 +21,6 @@
  * @return int
  */
 static inline int comparePixels(XImage *img, PIXEL reference, unsigned long read);
-
-/**
- * @brief
- *
- * @param display
- * @param root
- * @param x
- * @param y
- * @return int
- */
-int mouseMove(Display *display, Window *root, int x, int y);
-
-/**
- * @brief
- *
- * Inspiration for a mouse click comes from
- * https://stackoverflow.com/questions/8767524/how-do-we-simulate-a-mouse-click-with-xlib-c
- *
- * @param display
- * @param root
- * @param x
- * @param y
- * @return int
- */
-int moveAndClick(Display *display, Window *root, int x, int y);
 
 /**
  * Combination of capture.c and clicker.c
@@ -136,24 +112,4 @@ static inline int comparePixels(XImage *img, PIXEL reference, unsigned long read
 	unsigned char red = (read & img->red_mask) >> 16;
 
 	return blue == reference.blue && green == reference.green && red == reference.red;
-}
-
-int mouseMove(Display *display, Window *root, int x, int y)
-{
-	return XWarpPointer(display, None, *root, 0, 0, 0, 0, x, y) == BadWindow;
-}
-
-int moveAndClick(Display *display, Window *root, int x, int y)
-{
-	if (mouseMove(display, root, x, y))
-	{
-		return 1;
-	}
-	XTestFakeButtonEvent(display, Button1, True, 0);
-	XTestFakeButtonEvent(display, Button1, False, 0);
-
-	XFlush(display);
-	XSync(display, False);
-
-	return 0;
 }
