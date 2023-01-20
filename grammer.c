@@ -1,4 +1,5 @@
 #include "file.h"
+#include "string.h"
 
 #include <string.h>
 
@@ -34,13 +35,6 @@ typedef enum type
 } TYPE;
 
 #define STARTING_SIZE 2
-
-typedef struct string
-{
-	int length;
-	int capacity;
-	char *data;
-} STRING;
 
 typedef struct token
 {
@@ -118,21 +112,6 @@ int grammerCheck(COMMAND *c);
  * @param token
  */
 void printToken(TOKEN *token);
-
-/**
- * @brief
- *
- * @param s
- * @param c
- */
-void appendToString(STRING *s, char c);
-
-/**
- * @brief
- *
- * @param string
- */
-void enlargeString(STRING *string);
 
 int main()
 {
@@ -371,26 +350,4 @@ void printToken(TOKEN *t)
 	{
 		printf("Command: %d\n", t->type);
 	}
-}
-
-void appendToString(STRING *s, char c)
-{
-	s->data[s->length++] = c;
-
-	if (s->capacity == s->length)
-	{
-		enlargeString(s);
-	}
-}
-
-void enlargeString(STRING *string)
-{
-	char *data = malloc(string->capacity * 2 * sizeof(*data));
-	for (unsigned int i = 0; i < string->length; i++)
-	{
-		data[i] = string->data[i];
-	}
-	string->capacity *= 2;
-
-	string->data = data;
 }
