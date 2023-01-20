@@ -15,15 +15,20 @@ typedef enum type
 	CLICK,
 } TYPE;
 
-#define STARTING_SIZE 10
+#define STARTING_SIZE 2
+
+typedef struct string
+{
+	int length;
+	int capacity;
+	char *text;
+} STRING;
 
 typedef struct token
 {
 	TYPE type;
 
-	int length;
-	int capacity;
-	char *text;
+	STRING text;
 } TOKEN;
 
 typedef struct command
@@ -66,9 +71,17 @@ void textToType(TOKEN *token);
 /**
  * @brief
  *
- * @param token
+ * @param s
+ * @param c
  */
-void enlargeToken(TOKEN *token);
+void appendToString(STRING *s, char c);
+
+/**
+ * @brief
+ *
+ * @param string
+ */
+void enlargeString(STRING *string);
 
 int main()
 {
@@ -96,7 +109,7 @@ int main()
 
 	for (int i = 0; i < c.length; i++)
 	{
-		printf("%s\n", c.tokens[i].text);
+		printf("%s\n", c.tokens[i].text.text);
 	}
 }
 
@@ -116,9 +129,11 @@ void initToken(TOKEN *token)
 {
 	token->type = EMPTY;
 
-	token->length = 0;
-	token->capacity = STARTING_SIZE;
-	token->text = malloc(STARTING_SIZE * sizeof(*token->text));
+	STRING s = {};
+	s.length = 0;
+	s.capacity = STARTING_SIZE;
+	s.text = malloc(STARTING_SIZE * sizeof(*s.text));
+	token->text = s;
 }
 
 int toToken(READER *reader, TOKEN *token)
@@ -141,31 +156,35 @@ int toToken(READER *reader, TOKEN *token)
 			return 0;
 		}
 
-		token->text[token->length++] = c;
-
-		if (token->capacity == token->length)
-		{
-			enlargeToken(token);
-		}
-
+		appendToString(&token->text, c);
 		token->type = TEXT;
 	}
 	return 1;
 }
 
-void enlargeToken(TOKEN *token)
-{
-	char *text = malloc(token->capacity * 2 * sizeof(*text));
-	for (unsigned int i = 0; i < token->length; i++)
-	{
-		text[i] = token->text[i];
-	}
-	token->capacity *= 2;
-
-	token->text = text;
-}
-
 void textToType(TOKEN *token)
 {
 	token->type = TEXT;
+}
+
+void appendToString(STRING *s, char c)
+{
+	s->text[s->length++] = c;
+
+	if (s->capacity == s->length)
+	{
+		enlargeString(s);
+	}
+}
+
+void enlargeString(STRING *string)
+{
+	char *text = malloc(string->capacity * 2 * sizeof(*text));
+	for (unsigned int i = 0; i < string->length; i++)
+	{
+		text[i] = string->text[i];
+	}
+	string->capacity *= 2;
+
+	string->text = text;
 }
