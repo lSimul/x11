@@ -36,6 +36,13 @@ typedef struct command
 /**
  * @brief
  *
+ * @param command
+ */
+void enlargeCommands(COMMAND *command);
+
+/**
+ * @brief
+ *
  * @param token
  */
 void initToken(TOKEN *token);
@@ -56,6 +63,13 @@ int toToken(READER *reader, TOKEN *token);
  */
 void textToType(TOKEN *token);
 
+/**
+ * @brief
+ *
+ * @param token
+ */
+void enlargeToken(TOKEN *token);
+
 int main()
 {
 	READER r = {};
@@ -74,10 +88,9 @@ int main()
 			break;
 		}
 
-		// TODO: Enlarge.
 		if (++c.length == c.capacity)
 		{
-			break;
+			enlargeCommands(&c);
 		}
 	}
 
@@ -85,6 +98,18 @@ int main()
 	{
 		printf("%s\n", c.tokens[i].text);
 	}
+}
+
+void enlargeCommands(COMMAND *command)
+{
+	TOKEN *tokens = malloc(command->capacity * 2 * sizeof(*tokens));
+	for (unsigned int i = 0; i < command->length; i++)
+	{
+		tokens[i] = command->tokens[i];
+	}
+	command->capacity *= 2;
+
+	command->tokens = tokens;
 }
 
 void initToken(TOKEN *token)
@@ -117,9 +142,27 @@ int toToken(READER *reader, TOKEN *token)
 		}
 
 		token->text[token->length++] = c;
+
+		if (token->capacity == token->length)
+		{
+			enlargeToken(token);
+		}
+
 		token->type = TEXT;
 	}
 	return 1;
+}
+
+void enlargeToken(TOKEN *token)
+{
+	char *text = malloc(token->capacity * 2 * sizeof(*text));
+	for (unsigned int i = 0; i < token->length; i++)
+	{
+		text[i] = token->text[i];
+	}
+	token->capacity *= 2;
+
+	token->text = text;
 }
 
 void textToType(TOKEN *token)
