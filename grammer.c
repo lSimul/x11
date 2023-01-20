@@ -1,18 +1,35 @@
 #include "file.h"
 
+#include <string.h>
+
 typedef enum type
 {
 	EMPTY,
 
 	TEXT,
 
+	// "PRESS"
 	PRESS,
+
+	// "SEQUENCE"
 	SEQUENCE,
-	// COMMAND,
+
+	// COMMAND is used twice here, as a struct.
+	// "COMMAND",
+	T_COMMAND,
+
+	// "FIND"
 	FIND,
+
+	// "MOVE"
 	MOVE,
+
+	// "MOUSE"
 	MOUSE,
+
+	// "CLICK"
 	CLICK,
+
 	SEPARATOR,
 } TYPE;
 
@@ -72,6 +89,13 @@ void textToType(TOKEN *token);
 /**
  * @brief
  *
+ * @param token
+ */
+void printToken(TOKEN *token);
+
+/**
+ * @brief
+ *
  * @param s
  * @param c
  */
@@ -118,7 +142,7 @@ int main()
 
 	for (int i = 0; i < c.length; i++)
 	{
-		printf("%s\n", c.tokens[i].text.data);
+		printToken(&c.tokens[i]);
 	}
 }
 
@@ -191,7 +215,48 @@ void textToType(TOKEN *token)
 	{
 		return;
 	}
-	token->type = TEXT;
+
+	const char *str = token->text.data;
+	if (strcmp(str, "PRESS") == 0)
+	{
+		token->type = PRESS;
+	}
+	else if (strcmp(str, "SEQUENCE") == 0)
+	{
+		token->type = SEQUENCE;
+	}
+	else if (strcmp(str, "COMMAND") == 0)
+	{
+		token->type = T_COMMAND;
+	}
+	else if (strcmp(str, "FIND") == 0)
+	{
+		token->type = FIND;
+	}
+	else if (strcmp(str, "MOVE") == 0)
+	{
+		token->type = MOVE;
+	}
+	else if (strcmp(str, "MOUSE") == 0)
+	{
+		token->type = MOUSE;
+	}
+	else if (strcmp(str, "CLICK") == 0)
+	{
+		token->type = CLICK;
+	}
+}
+
+void printToken(TOKEN *t)
+{
+	if (t->type == TEXT)
+	{
+		printf("Unparsed text: %s\n", t->text.data);
+	}
+	else
+	{
+		printf("Command: %d\n", t->type);
+	}
 }
 
 void appendToString(STRING *s, char c)
