@@ -51,6 +51,8 @@ typedef struct token
 
 typedef struct command
 {
+	struct command *next;
+
 	int length;
 	int capacity;
 	TOKEN *tokens;
@@ -113,42 +115,55 @@ int main()
 	READER r = {};
 	openFile(&r, "commands.txt");
 
-	COMMAND c = {};
-	c.length = 0;
-	c.capacity = STARTING_SIZE;
-	c.tokens = malloc(STARTING_SIZE * sizeof(*c.tokens));
+	COMMAND *c = malloc(sizeof(*c));
+	c->next = NULL;
+	c->length = 0;
+	c->capacity = STARTING_SIZE;
+	c->tokens = malloc(STARTING_SIZE * sizeof(*c->tokens));
+
+	COMMAND *root = c;
 
 	while (1)
 	{
-		initToken(&(c.tokens[c.length]));
-		if (toToken(&r, &(c.tokens[c.length])))
+		initToken(&(c->tokens[c->length]));
+		if (toToken(&r, &(c->tokens[c->length])))
 		{
 			break;
 		}
 
-		textToType(&(c.tokens[c.length]));
+		textToType(&(c->tokens[c->length]));
 
-		if (c.tokens[c.length].type == SEPARATOR)
+		if (c->tokens[c->length].type == SEPARATOR)
 		{
-			if (c.length == 0)
+			if (c->length > 0)
 			{
-				continue;
+				COMMAND *newC = malloc(sizeof(*newC));
+				newC->next = NULL;
+				newC->length = 0;
+				newC->capacity = STARTING_SIZE;
+				newC->tokens = malloc(STARTING_SIZE * sizeof(*newC->tokens));
+
+				c->next = newC;
+				c = newC;
 			}
-			else
-			{
-				break;
-			}
+			continue;
 		}
 
-		if (++c.length == c.capacity)
+		if (++c->length == c->capacity)
 		{
-			enlargeCommands(&c);
+			enlargeCommands(c);
 		}
 	}
 
-	for (int i = 0; i < c.length; i++)
+	c = root;
+	while (c != NULL)
 	{
-		printToken(&c.tokens[i]);
+		for (int i = 0; i < c->length; i++)
+		{
+			printToken(&c->tokens[i]);
+		}
+		printf("\n");
+		c = c->next;
 	}
 }
 
