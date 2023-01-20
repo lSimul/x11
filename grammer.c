@@ -130,8 +130,14 @@ int main()
 
 		if (c.tokens[c.length].type == SEPARATOR)
 		{
-			printf("Whole command parsed.\n");
-			break;
+			if (c.length == 0)
+			{
+				continue;
+			}
+			else
+			{
+				break;
+			}
 		}
 
 		if (++c.length == c.capacity)
