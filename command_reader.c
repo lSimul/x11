@@ -1,5 +1,6 @@
 #include "grammer.h"
 #include "keys.h"
+#include "movement.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +37,13 @@ void C_pressSequence(Display *display, COMMAND *command);
  * @param command
  */
 void C_pressCommand(Display *display, COMMAND *command);
+
+/**
+ * @brief
+ *
+ * @param command
+ */
+void C_click(Display *display, COMMAND *command);
 
 int main(int argc, const char **argv)
 {
@@ -78,6 +86,10 @@ void C_execute(Display *display, COMMAND *command)
 		if (t.type == PRESS)
 		{
 			C_press(display, command);
+		}
+		else if (t.type == CLICK)
+		{
+			C_click(display, command);
 		}
 
 		command = command->next;
@@ -202,4 +214,9 @@ KeySym readSequenceToKeySym(const char read[5], int readCount)
 		return XK_Alt_L;
 	}
 	return 0;
+}
+
+void C_click(Display *display, COMMAND *command)
+{
+	click(display);
 }

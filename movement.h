@@ -2,6 +2,20 @@
 #include <X11/Xutil.h>
 
 /**
+ * @brief Code doing basically absolutely nothing.
+ *
+ * Represents one of the actions in the grammer, simple _click_.
+ * No context, no movement of the mouse.
+ *
+ * It might be correct approach, moveAndClick <=> mouseMove + click.
+ * Atlast in the grammer right now it makes perfect sense.
+ *
+ * @param display
+ * @return int
+ */
+int click(Display *display);
+
+/**
  * @brief Everything copied from https://stackoverflow.com/questions/20581343/how-to-move-the-mouse-cursor-from-user-code,
  * tweaked pretty heavily.
  *

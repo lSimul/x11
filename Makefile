@@ -3,7 +3,7 @@ LIBS = -lX11
 
 all: capture_and_clicker command_reader
 
-command_reader: command_reader.c grammer.o file.o string.o command.o token.o keys.o
+command_reader: command_reader.c grammer.o file.o string.o command.o token.o keys.o movement.o
 	$(C) $^ $(LIBS) -lXtst -o $@
 
 grammer.o: grammer.c grammer.h
