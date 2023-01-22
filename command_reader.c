@@ -1,3 +1,4 @@
+#include "common.h"
 #include "grammer.h"
 #include "keys.h"
 #include "movement.h"
@@ -13,37 +14,42 @@
 /**
  * @brief
  *
+ * @param instance
  * @param command
  */
-void C_execute(Display *display, COMMAND *command);
+void C_execute(X_INSTANCE *instance, COMMAND *command);
 
 /**
  * @brief
  *
+ * @param instance
  * @param command
  */
-void C_press(Display *display, COMMAND *command);
+void C_press(X_INSTANCE *instance, COMMAND *command);
 
 /**
  * @brief
  *
+ * @param instance
  * @param command
  */
-void C_pressSequence(Display *display, COMMAND *command);
+void C_pressSequence(X_INSTANCE *instance, COMMAND *command);
 
 /**
  * @brief
  *
+ * @param instance
  * @param command
  */
-void C_pressCommand(Display *display, COMMAND *command);
+void C_pressCommand(X_INSTANCE *instance, COMMAND *command);
 
 /**
  * @brief
  *
+ * @param instance
  * @param command
  */
-void C_click(Display *display, COMMAND *command);
+void C_click(X_INSTANCE *instance, COMMAND *command);
 
 int main(int argc, const char **argv)
 {
@@ -72,24 +78,31 @@ int main(int argc, const char **argv)
 	}
 	*/
 
-	Display *display = XOpenDisplay(NULL);
-	C_execute(display, c);
+	X_INSTANCE instance = {};
+	instance.display = XOpenDisplay(NULL);
+	if (instance.display == NULL)
+	{
+		printf("No display found.\n");
+		return 1;
+	}
+
+	C_execute(&instance, c);
 
 	return 0;
 }
 
-void C_execute(Display *display, COMMAND *command)
+void C_execute(X_INSTANCE *instance, COMMAND *command)
 {
 	while (command != NULL)
 	{
 		TOKEN t = command->tokens[0];
 		if (t.type == PRESS)
 		{
-			C_press(display, command);
+			C_press(instance, command);
 		}
 		else if (t.type == CLICK)
 		{
-			C_click(display, command);
+			C_click(instance, command);
 		}
 
 		command = command->next;
@@ -99,16 +112,16 @@ void C_execute(Display *display, COMMAND *command)
 	}
 }
 
-void C_press(Display *display, COMMAND *command)
+void C_press(X_INSTANCE *instance, COMMAND *command)
 {
 	TOKEN t = command->tokens[1];
 	if (t.type == SEQUENCE)
 	{
-		C_pressSequence(display, command);
+		C_pressSequence(instance, command);
 	}
 	else if (t.type = T_COMMAND)
 	{
-		C_pressCommand(display, command);
+		C_pressCommand(instance, command);
 	}
 	else
 	{
@@ -116,19 +129,19 @@ void C_press(Display *display, COMMAND *command)
 	}
 }
 
-void C_pressSequence(Display *display, COMMAND *command)
+void C_pressSequence(X_INSTANCE *instance, COMMAND *command)
 {
 	for (int i = 0; i < command->tokens[2].text.length; i++)
 	{
 		char c = command->tokens[2].text.data[i];
 		if (c >= 'a' && c <= 'z' || c == '-')
 		{
-			pressKey(display, c);
+			pressKey(instance->display, c);
 		}
 		else if (c >= 'A' && c <= 'Z')
 		{
-			EVENT *q = press(display, NULL, XK_Shift_L);
-			q = press(display, q, c);
+			EVENT *q = press(instance->display, NULL, XK_Shift_L);
+			q = press(instance->display, q, c);
 			release(q);
 		}
 	}
@@ -136,7 +149,7 @@ void C_pressSequence(Display *display, COMMAND *command)
 
 KeySym readSequenceToKeySym(const char read[5], int readCount);
 
-void C_pressCommand(Display *display, COMMAND *command)
+void C_pressCommand(X_INSTANCE *instance, COMMAND *command)
 {
 	EVENT *q = NULL;
 
@@ -158,7 +171,7 @@ void C_pressCommand(Display *display, COMMAND *command)
 				int ks = readSequenceToKeySym(read, readCount);
 				if (ks > 0)
 				{
-					q = press(display, q, ks);
+					q = press(instance->display, q, ks);
 				}
 			}
 			break;
@@ -172,7 +185,7 @@ void C_pressCommand(Display *display, COMMAND *command)
 				int ks = readSequenceToKeySym(read, readCount);
 				if (ks > 0)
 				{
-					q = press(display, q, ks);
+					q = press(instance->display, q, ks);
 				}
 				for (int j = 0; j < 5; j++)
 				{
@@ -216,7 +229,7 @@ KeySym readSequenceToKeySym(const char read[5], int readCount)
 	return 0;
 }
 
-void C_click(Display *display, COMMAND *command)
+void C_click(X_INSTANCE *instance, COMMAND *command)
 {
-	click(display);
+	click(instance->display);
 }
