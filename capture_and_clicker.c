@@ -1,5 +1,5 @@
-// Contains pixel.h, too
-#include "file.h"
+#include "common.h"
+#include "file.h" // Contains pixel.h, too
 #include "movement.h"
 
 #include <stdio.h>
@@ -11,19 +11,6 @@
 #include <X11/extensions/XTest.h>
 
 #define STEP_COUNT 2
-
-typedef struct coords
-{
-	int x;
-	int y;
-} COORDS;
-
-typedef struct x_instance
-{
-	Display *display;
-	Window window;
-	XWindowAttributes attrs;
-} X_INSTANCE;
 
 /**
  * @brief
