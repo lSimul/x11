@@ -12,6 +12,23 @@
 
 #define STEP_COUNT 2
 
+typedef struct coords
+{
+	int x;
+	int y;
+} COORDS;
+
+/**
+ * @brief
+ *
+ * @param result
+ * @param needle
+ * @param display
+ * @param window
+ * @return int
+ */
+int findImage(COORDS *result, BITMAP *needle, Display *display, Window *window);
+
 /**
  * @brief
  *
@@ -66,39 +83,20 @@ int main()
 			return 1;
 		}
 
-		XImage *img = XGetImage(display, root, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
-		int matched = 0;
-		int success = 0;
-		for (int y = 0; y < img->height; y++)
+		COORDS c = {};
+
+		if (findImage(&c, &bitmap, display, &root))
 		{
-			for (int x = 0; x < img->width; x++)
-			{
-				unsigned long pixel = XGetPixel(img, x, y);
-				if (comparePixels(img, bitmap.data[matched], pixel))
-				{
-					if (++matched == bitmap.size)
-					{
-						if (moveAndClick(display, &root, x, y))
-						{
-							goto NEXT;
-						}
-						success = 1;
-						goto NEXT;
-					}
-				}
-				else
-				{
-					matched = 0;
-				}
-			}
+			free(bitmap.data);
+			printf("Failed finding stuff in '%s'\n", steps[i]);
+			break;
 		}
-	NEXT:
 		free(bitmap.data);
 
-		if (!success)
+		if (moveAndClick(display, &root, c.x, c.y))
 		{
-			printf("Failed finding stuff in '%s'\n", steps[i]);
-			goto END;
+			printf("Failed moving and clicking mouse.\n");
+			break;
 		}
 
 		while (XPending(display))
@@ -109,9 +107,39 @@ int main()
 		sleep(1);
 	}
 
-END:
 	XCloseDisplay(display);
 	return 0;
+}
+
+int findImage(COORDS *result, BITMAP *needle, Display *display, Window *window)
+{
+	XWindowAttributes attributes;
+	XGetWindowAttributes(display, *window, &attributes);
+
+	XImage *haystack = XGetImage(display, *window, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
+
+	int matched = 0;
+	for (int y = 0; y < haystack->height; y++)
+	{
+		for (int x = 0; x < haystack->width; x++)
+		{
+			unsigned long pixel = XGetPixel(haystack, x, y);
+			if (comparePixels(haystack, needle->data[matched], pixel))
+			{
+				if (++matched == needle->size)
+				{
+					result->x = x;
+					result->y = y;
+					return 0;
+				}
+			}
+			else
+			{
+				matched = 0;
+			}
+		}
+	}
+	return 1;
 }
 
 static inline int comparePixels(XImage *img, PIXEL reference, unsigned long read)
