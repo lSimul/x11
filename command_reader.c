@@ -1,4 +1,5 @@
 #include "common.h"
+#include "image.h"
 #include "grammer.h"
 #include "keys.h"
 #include "movement.h"
@@ -48,6 +49,16 @@ void C_pressCommand(X_INSTANCE *instance, COMMAND *command);
  *
  * @param instance
  * @param command
+ * @param coords
+ * @return int
+ */
+int C_findImage(X_INSTANCE *instance, COMMAND *command, COORDS *coords);
+
+/**
+ * @brief
+ *
+ * @param instance
+ * @param command
  */
 void C_click(X_INSTANCE *instance, COMMAND *command);
 
@@ -85,6 +96,10 @@ int main(int argc, const char **argv)
 		printf("No display found.\n");
 		return 1;
 	}
+	// Use only in C_findImage, but there is no
+	// fear of initialiazing it anytime.
+	instance.window = XDefaultRootWindow(instance.display);
+	XGetWindowAttributes(instance.display, instance.window, &instance.attrs);
 
 	C_execute(&instance, c);
 
@@ -93,6 +108,8 @@ int main(int argc, const char **argv)
 
 void C_execute(X_INSTANCE *instance, COMMAND *command)
 {
+	COORDS coords = {};
+
 	while (command != NULL)
 	{
 		TOKEN t = command->tokens[0];
@@ -103,6 +120,15 @@ void C_execute(X_INSTANCE *instance, COMMAND *command)
 		else if (t.type == CLICK)
 		{
 			C_click(instance, command);
+		}
+		else if (t.type == FIND)
+		{
+			if (C_findImage(instance, command, &coords))
+			{
+				printf("Image not found.\n");
+				coords.x = -1;
+				coords.y = -1;
+			}
 		}
 
 		command = command->next;
@@ -226,6 +252,28 @@ KeySym readSequenceToKeySym(const char read[5], int readCount)
 	{
 		return XK_Alt_L;
 	}
+	return 0;
+}
+
+int C_findImage(X_INSTANCE *instance, COMMAND *command, COORDS *c)
+{
+	const char *src = command->tokens[1].text.data;
+
+	BITMAP bitmap = {};
+	if (readBitmap(&bitmap, src))
+	{
+		printf("Fail while reading '%s'.\n", src);
+		return 1;
+	}
+
+	if (findImage(c, &bitmap, instance))
+	{
+		free(bitmap.data);
+		printf("Failed finding stuff in '%s'\n", src);
+		return 1;
+	}
+	free(bitmap.data);
+
 	return 0;
 }
 
