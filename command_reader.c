@@ -130,6 +130,19 @@ void C_execute(X_INSTANCE *instance, COMMAND *command)
 				coords.y = -1;
 			}
 		}
+		else if (t.type == MOVE)
+		{
+			// Now it does not even need an extra function.
+			// No checks for the next argument MOUSE.
+			if (coords.x == -1 && coords.y == -1)
+			{
+				printf("No idea where to move.\n");
+			}
+			else
+			{
+				mouseMove(instance->display, &instance->window, coords.x, coords.y);
+			}
+		}
 
 		command = command->next;
 		// TODO: Sleeps are really annoying, but they
