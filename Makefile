@@ -1,7 +1,7 @@
 C = gcc
 LIBS = -lX11
 
-all: capture_and_clicker command_reader
+all: command_reader
 
 command_reader: command_reader.c grammer.o file.o string.o command.o token.o keys.o movement.o image.o
 	$(C) $^ $(LIBS) -lXtst -o $@
@@ -26,9 +26,6 @@ movement.o: movement.c movement.h
 
 image.o: image.c image.h
 	$(C) $< -c -o $@
-
-capture_and_clicker: capture_and_clicker.c file.o movement.o image.o
-	$(C) $^ $(LIBS) -lXtst -o $@
 
 keys.o: keys.c keys.h
 	$(C) $< -c -o $@

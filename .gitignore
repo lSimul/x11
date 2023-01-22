@@ -1,5 +1,4 @@
 *.o
-capture_and_clicker
 command_reader
 _*
 html/*

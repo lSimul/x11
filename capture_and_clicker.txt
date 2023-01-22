@@ -1,0 +1,6 @@
+FIND images/line.bmp
+MOVE MOUSE
+CLICK
+FIND images/terminal.bmp
+MOVE MOUSE
+CLICK
