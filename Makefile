@@ -24,7 +24,10 @@ string.o: string.c string.h
 movement.o: movement.c movement.h
 	$(C) $< -c -o $@
 
-capture_and_clicker: capture_and_clicker.c file.o movement.o
+image.o: image.c image.h
+	$(C) $< -c -o $@
+
+capture_and_clicker: capture_and_clicker.c file.o movement.o image.o
 	$(C) $^ $(LIBS) -lXtst -o $@
 
 keys.o: keys.c keys.h
