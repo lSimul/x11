@@ -18,6 +18,13 @@ typedef struct coords
 	int y;
 } COORDS;
 
+typedef struct x_instance
+{
+	Display *display;
+	Window window;
+	XWindowAttributes attrs;
+} X_INSTANCE;
+
 /**
  * @brief
  *
@@ -27,7 +34,7 @@ typedef struct coords
  * @param window
  * @return int
  */
-int findImage(COORDS *result, BITMAP *needle, Display *display, Window *window);
+int findImage(COORDS *result, BITMAP *needle, X_INSTANCE *instance);
 
 /**
  * @brief
@@ -61,15 +68,16 @@ int main()
 {
 	BITMAP bitmap = {};
 
-	Display *display = XOpenDisplay(NULL);
-	if (display == NULL)
+	X_INSTANCE instance = {};
+
+	instance.display = XOpenDisplay(NULL);
+	if (instance.display == NULL)
 	{
 		printf("No display found.\n");
 		return 1;
 	}
-	Window root = XDefaultRootWindow(display);
-	XWindowAttributes attributes;
-	XGetWindowAttributes(display, root, &attributes);
+	instance.window = XDefaultRootWindow(instance.display);
+	XGetWindowAttributes(instance.display, instance.window, &instance.attrs);
 
 	static const char *steps[STEP_COUNT] = {
 		"images/line.bmp",
@@ -85,7 +93,7 @@ int main()
 
 		COORDS c = {};
 
-		if (findImage(&c, &bitmap, display, &root))
+		if (findImage(&c, &bitmap, &instance))
 		{
 			free(bitmap.data);
 			printf("Failed finding stuff in '%s'\n", steps[i]);
@@ -93,13 +101,13 @@ int main()
 		}
 		free(bitmap.data);
 
-		if (moveAndClick(display, &root, c.x, c.y))
+		if (moveAndClick(instance.display, &(instance.window), c.x, c.y))
 		{
 			printf("Failed moving and clicking mouse.\n");
 			break;
 		}
 
-		while (XPending(display))
+		while (XPending(instance.display))
 		{
 			sleep(1);
 		}
@@ -107,16 +115,13 @@ int main()
 		sleep(1);
 	}
 
-	XCloseDisplay(display);
+	XCloseDisplay(instance.display);
 	return 0;
 }
 
-int findImage(COORDS *result, BITMAP *needle, Display *display, Window *window)
+int findImage(COORDS *result, BITMAP *needle, X_INSTANCE *instance)
 {
-	XWindowAttributes attributes;
-	XGetWindowAttributes(display, *window, &attributes);
-
-	XImage *haystack = XGetImage(display, *window, 0, 0, attributes.width, attributes.height, AllPlanes, ZPixmap);
+	XImage *haystack = XGetImage(instance->display, instance->window, 0, 0, instance->attrs.width, instance->attrs.height, AllPlanes, ZPixmap);
 
 	int matched = 0;
 	for (int y = 0; y < haystack->height; y++)
