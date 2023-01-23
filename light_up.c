@@ -480,42 +480,45 @@ void lightUpSurroundingTilesIfAble(X_INSTANCE *instance, BOARD *board, int x, in
 
 void disableTilesAboveLimit(X_INSTANCE *instance, BOARD *board, int x, int y, int coordX, int coordY)
 {
+	TILE *t = NULL;
 	if (x + 1 < BOARD_SIZE)
 	{
-		if (board->tiles[coordsToIndex(x + 1, y)].type == EMPTY)
+		t = &board->tiles[coordsToIndex(x + 1, y)];
+		if (t->type == EMPTY)
 		{
 			moveAndRightClick(instance->display, &instance->window, coordX + TILE_SIZE, coordY);
 			sleep(1);
-			board->tiles[coordsToIndex(x + 1, y)].type = DISABLED;
+			t->type = DISABLED;
 		}
 	}
 	if (x - 1 >= 0)
 	{
-		if (board->tiles[coordsToIndex(x - 1, y)].type == EMPTY)
+		t = &board->tiles[coordsToIndex(x - 1, y)];
+		if (t->type == EMPTY)
 		{
 			moveAndRightClick(instance->display, &instance->window, coordX - TILE_SIZE, coordY);
 			sleep(1);
-			board->tiles[coordsToIndex(x - 1, y)].type = DISABLED;
+			t->type = DISABLED;
 		}
 	}
 	if (y + 1 < BOARD_SIZE)
 	{
-		if (board->tiles[coordsToIndex(x, y + 1)].type == EMPTY)
+		t = &board->tiles[coordsToIndex(x, y + 1)];
+		if (t->type == EMPTY)
 		{
-
 			moveAndRightClick(instance->display, &instance->window, coordX, coordY + TILE_SIZE);
 			sleep(1);
-			board->tiles[coordsToIndex(x, y + 1)].type = DISABLED;
+			t->type = DISABLED;
 		}
 	}
 	if (y - 1 >= 0)
 	{
-		if (board->tiles[coordsToIndex(x, y - 1)].type == EMPTY)
+		t = &board->tiles[coordsToIndex(x, y - 1)];
+		if (t->type == EMPTY)
 		{
-
 			moveAndRightClick(instance->display, &instance->window, coordX, coordY - TILE_SIZE);
 			sleep(1);
-			board->tiles[coordsToIndex(x, y - 1)].type = DISABLED;
+			t->type = DISABLED;
 		}
 	}
 }
