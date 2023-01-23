@@ -13,7 +13,9 @@ COORDS *findAllImages(int *count, BITMAP *needle, X_INSTANCE *instance)
 
 	XImage *haystack = XGetImage(instance->display, instance->window, 0, 0, instance->attrs.width, instance->attrs.height, AllPlanes, ZPixmap);
 
-	COORDS *result = malloc(10 * sizeof(*result));
+	int currentSize = 10;
+
+	COORDS *result = malloc(currentSize * sizeof(*result));
 
 	for (int y = 0; y < haystack->height; y++)
 	{
@@ -29,6 +31,17 @@ COORDS *findAllImages(int *count, BITMAP *needle, X_INSTANCE *instance)
 
 				if (!findComplexImageInner(needle, haystack, x, y))
 				{
+					if (*count == currentSize)
+					{
+						COORDS *newResult = malloc(2 * currentSize * sizeof(*newResult));
+						for (int i = 0; i < currentSize; i++)
+						{
+							newResult[i] = result[i];
+						}
+						currentSize *= 2;
+						result = newResult;
+					}
+
 					result[*count].x = x;
 					result[*count].y = y;
 					(*count)++;
