@@ -46,3 +46,14 @@ int mouseMove(Display *display, Window *root, int x, int y);
  * @return int
  */
 int moveAndClick(Display *display, Window *root, int x, int y);
+
+/**
+ * @brief
+ *
+ * @param display
+ * @param root
+ * @param x
+ * @param y
+ * @return int
+ */
+int moveAndRightClick(Display *display, Window *root, int x, int y);

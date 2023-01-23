@@ -3,6 +3,10 @@
 #include "image.h"
 #include "movement.h"
 
+#include <unistd.h>
+
+#define BOARD_SIZE 7
+
 #define OPTIONS 7
 
 #define TILE_SIZE 124
@@ -22,7 +26,8 @@ typedef enum tile_type
 	EMPTY,
 
 	LIGHT,
-	BULD,
+	BULB,
+	DISABLED,
 } TILE_TYPE;
 
 typedef struct tile
@@ -41,6 +46,10 @@ typedef struct board
 
 	TILE *tiles;
 } BOARD;
+
+void lightUp(BOARD *board, int x, int y);
+
+int coordsToIndex(int refX, int refY);
 
 int orderTiles(const void *l, const void *r)
 {
@@ -80,7 +89,7 @@ int main()
 
 	BOARD board = {};
 	// I will start with 7x7 puzzle only.
-	board.height = board.width = 7;
+	board.height = board.width = BOARD_SIZE;
 	board.size = board.height * board.width;
 	board.tiles = malloc(board.size * sizeof(*board.tiles));
 	int sum = 0;
@@ -115,28 +124,189 @@ int main()
 	}
 	qsort(board.tiles, board.size, sizeof(*board.tiles), orderTiles);
 
-	for (int i = 0; i < board.size; i++)
-	{
-		printf("X: %d\nY: %d\nT: %d\n\n", board.tiles[i].x, board.tiles[i].y, board.tiles[i].type);
-	}
-
 	// Very naive approach.
 	for (int i = 0; i < board.size; i++)
 	{
-		if (board.tiles[i].type == VALUE_4)
+		int x = i % BOARD_SIZE;
+		int y = (i - i % BOARD_SIZE) / BOARD_SIZE;
+
+		int coordX = board.tiles[i].x;
+		int coordY = board.tiles[i].y;
+
+		coordX += TILE_SIZE / 2;
+		coordY += TILE_SIZE / 2;
+
+		if (board.tiles[i].type == VALUE_0)
 		{
+			if (x + 1 < BOARD_SIZE)
+			{
+				moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+				sleep(1);
+			}
+			if (x - 1 >= 0)
+			{
+				moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+				sleep(1);
+			}
+			if (y + 1 < BOARD_SIZE)
+			{
+				moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+				sleep(1);
+			}
+			if (y - 1 >= 0)
+			{
+				moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+				sleep(1);
+			}
+		}
+		else if (board.tiles[i].type == VALUE_4)
+		{
+			moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+			sleep(1);
+			lightUp(&board, x, y);
+
+			moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+			sleep(1);
+			lightUp(&board, x, y);
+
+			moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+			sleep(1);
+			lightUp(&board, x, y);
+
+			moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+			sleep(1);
+			lightUp(&board, x, y);
+		}
+	}
+
+	char end = 0;
+	while (1)
+	{
+		end = 0;
+		for (int i = 0; i < board.size; i++)
+		{
+			if (board.tiles[i].type == EMPTY)
+			{
+				end++;
+				break;
+			}
+		}
+		if (!end)
+		{
+			break;
+		}
+
+		for (int i = 0; i < board.size; i++)
+		{
+
+			int x = i % BOARD_SIZE;
+			int y = (i - i % BOARD_SIZE) / BOARD_SIZE;
+
 			int coordX = board.tiles[i].x;
 			int coordY = board.tiles[i].y;
 
 			coordX += TILE_SIZE / 2;
 			coordY += TILE_SIZE / 2;
-			moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
-			moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
-
-			moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
-			moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
 		}
+		printf("Everything is not resolved.");
+		break;
 	}
 
 	free(board.tiles);
+}
+
+void lightUp(BOARD *board, int refX, int refY)
+{
+	int x = refX;
+	int y = refY;
+	while (1)
+	{
+		if (x >= BOARD_SIZE || x < 0 || y >= BOARD_SIZE || y < 0)
+		{
+			break;
+		}
+		int i = coordsToIndex(x, y);
+		TILE t = board->tiles[i];
+		if (t.type == EMPTY || t.type == LIGHT)
+		{
+			t.type = LIGHT;
+			x--;
+		}
+		else
+		{
+
+			break;
+		}
+	}
+
+	x = refX;
+	y = refY;
+	while (1)
+	{
+		if (x >= BOARD_SIZE || x < 0 || y >= BOARD_SIZE || y < 0)
+		{
+			break;
+		}
+		int i = coordsToIndex(x, y);
+		TILE t = board->tiles[i];
+		if (t.type == EMPTY || t.type == LIGHT)
+		{
+			t.type = LIGHT;
+			y--;
+		}
+		else
+		{
+
+			break;
+		}
+	}
+
+	x = refX;
+	y = refY;
+	while (1)
+	{
+		if (x >= BOARD_SIZE || x < 0 || y >= BOARD_SIZE || y < 0)
+		{
+			break;
+		}
+		int i = coordsToIndex(x, y);
+		TILE t = board->tiles[i];
+		if (t.type == EMPTY || t.type == LIGHT)
+		{
+			t.type = LIGHT;
+			x++;
+		}
+		else
+		{
+
+			break;
+		}
+	}
+
+	x = refX;
+	y = refY;
+	while (1)
+	{
+		if (x >= BOARD_SIZE || x < 0 || y >= BOARD_SIZE || y < 0)
+		{
+			break;
+		}
+		int i = coordsToIndex(x, y);
+		TILE t = board->tiles[i];
+		if (t.type == EMPTY || t.type == LIGHT)
+		{
+			t.type = LIGHT;
+			y++;
+		}
+		else
+		{
+
+			break;
+		}
+	}
+}
+
+int coordsToIndex(int x, int y)
+{
+	return x + y * BOARD_SIZE;
 }

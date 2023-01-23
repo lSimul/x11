@@ -31,3 +31,18 @@ int moveAndClick(Display *display, Window *root, int x, int y)
 
 	return 0;
 }
+
+int moveAndRightClick(Display *display, Window *root, int x, int y)
+{
+	if (mouseMove(display, root, x, y))
+	{
+		return 1;
+	}
+	XTestFakeButtonEvent(display, Button3, True, 0);
+	XTestFakeButtonEvent(display, Button3, False, 0);
+
+	XFlush(display);
+	XSync(display, False);
+
+	return 0;
+}
