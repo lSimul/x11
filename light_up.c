@@ -18,8 +18,6 @@ int main()
 		printf("No display found.\n");
 		return 1;
 	}
-	// Use only in C_findImage, but there is no
-	// fear of initialiazing it anytime.
 	instance.window = XDefaultRootWindow(instance.display);
 	XGetWindowAttributes(instance.display, instance.window, &instance.attrs);
 
