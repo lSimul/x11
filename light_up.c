@@ -47,9 +47,17 @@ typedef struct board
 	TILE *tiles;
 } BOARD;
 
+typedef struct empty_bulb
+{
+	char empty;
+	char bulb;
+} EMPTY_BULB;
+
 void lightUp(BOARD *board, int x, int y);
 
 int coordsToIndex(int refX, int refY);
+
+EMPTY_BULB evaluateTileSurroundings(const BOARD *board, int x, int y);
 
 int orderTiles(const void *l, const void *r)
 {
@@ -209,60 +217,11 @@ int main()
 			coordX += TILE_SIZE / 2;
 			coordY += TILE_SIZE / 2;
 
-			if (board.tiles[i].type == VALUE_3)
-			{
-				char empty = 0;
-				char bulb = 0;
-				if (x + 1 < BOARD_SIZE)
-				{
-					TILE_TYPE t = board.tiles[coordsToIndex(x + 1, y)].type;
-					if (t == EMPTY)
-					{
-						empty++;
-					}
-					else if (t == BULB)
-					{
-						bulb++;
-					}
-				}
-				if (x - 1 >= 0)
-				{
-					TILE_TYPE t = board.tiles[coordsToIndex(x - 1, y)].type;
-					if (t == EMPTY)
-					{
-						empty++;
-					}
-					else if (t == BULB)
-					{
-						bulb++;
-					}
-				}
-				if (y + 1 < BOARD_SIZE)
-				{
-					TILE_TYPE t = board.tiles[coordsToIndex(x, y + 1)].type;
-					if (t == EMPTY)
-					{
-						empty++;
-					}
-					else if (t == BULB)
-					{
-						bulb++;
-					}
-				}
-				if (y - 1 >= 0)
-				{
-					TILE_TYPE t = board.tiles[coordsToIndex(x, y - 1)].type;
-					if (t == EMPTY)
-					{
-						empty++;
-					}
-					else if (t == BULB)
-					{
-						bulb++;
-					}
-				}
+			EMPTY_BULB stats = evaluateTileSurroundings(&board, x, y);
 
-				if (bulb == 3)
+			if (board.tiles[i].type == VALUE_1)
+			{
+				if (stats.bulb == 1 && stats.empty > 0)
 				{
 					if (x + 1 < BOARD_SIZE)
 					{
@@ -270,6 +229,7 @@ int main()
 						{
 							moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
 							sleep(1);
+							board.tiles[coordsToIndex(x + 1, y)].type = DISABLED;
 						}
 					}
 					if (x - 1 >= 0)
@@ -278,6 +238,7 @@ int main()
 						{
 							moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
 							sleep(1);
+							board.tiles[coordsToIndex(x - 1, y)].type = DISABLED;
 						}
 					}
 					if (y + 1 < BOARD_SIZE)
@@ -286,6 +247,7 @@ int main()
 						{
 							moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
 							sleep(1);
+							board.tiles[coordsToIndex(x, y + 1)].type = DISABLED;
 						}
 					}
 					if (y - 1 >= 0)
@@ -294,16 +256,192 @@ int main()
 						{
 							moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
 							sleep(1);
+							board.tiles[coordsToIndex(x, y - 1)].type = DISABLED;
 						}
 					}
-
+					tileSolved++;
 					continue;
 				}
-				else if (empty == 4 || empty == 0)
+				else if (stats.empty == 1)
+				{
+
+					if (x + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY)
+						{
+							moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+							sleep(1);
+							lightUp(&board, x + 1, y);
+						}
+					}
+					if (x - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY)
+						{
+							moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+							sleep(1);
+							lightUp(&board, x - 1, y);
+						}
+					}
+					if (y + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY)
+						{
+
+							moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+							sleep(1);
+							lightUp(&board, x, y + 1);
+						}
+					}
+					if (y - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY)
+						{
+
+							moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+							sleep(1);
+							lightUp(&board, x, y - 1);
+						}
+					}
+					tileSolved++;
+					continue;
+				}
+			}
+			else if (board.tiles[i].type == VALUE_2)
+			{
+				if (stats.bulb == 2)
+				{
+					if (x + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY || board.tiles[coordsToIndex(x + 1, y)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+							sleep(1);
+							board.tiles[coordsToIndex(x + 1, y)].type = DISABLED;
+						}
+					}
+					if (x - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY || board.tiles[coordsToIndex(x - 1, y)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+							sleep(1);
+							board.tiles[coordsToIndex(x - 1, y)].type = DISABLED;
+						}
+					}
+					if (y + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY || board.tiles[coordsToIndex(x, y + 1)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+							sleep(1);
+							board.tiles[coordsToIndex(x, y + 1)].type = DISABLED;
+						}
+					}
+					if (y - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY || board.tiles[coordsToIndex(x, y - 1)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+							sleep(1);
+							board.tiles[coordsToIndex(x, y - 1)].type = DISABLED;
+						}
+					}
+					tileSolved++;
+					continue;
+				}
+				else if (stats.bulb + stats.empty == 2)
+				{
+					if (x + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY)
+						{
+							moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+							sleep(1);
+							lightUp(&board, x + 1, y);
+						}
+					}
+					if (x - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY)
+						{
+							moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+							sleep(1);
+							lightUp(&board, x - 1, y);
+						}
+					}
+					if (y + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY)
+						{
+
+							moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+							sleep(1);
+							lightUp(&board, x, y + 1);
+						}
+					}
+					if (y - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY)
+						{
+
+							moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+							sleep(1);
+							lightUp(&board, x, y - 1);
+						}
+					}
+					tileSolved++;
+					continue;
+				}
+			}
+			else if (board.tiles[i].type == VALUE_3)
+			{
+				if (stats.bulb == 3)
+				{
+					if (x + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY || board.tiles[coordsToIndex(x + 1, y)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+							sleep(1);
+							board.tiles[coordsToIndex(x + 1, y)].type = DISABLED;
+						}
+					}
+					if (x - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY || board.tiles[coordsToIndex(x - 1, y)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+							sleep(1);
+							board.tiles[coordsToIndex(x - 1, y)].type = DISABLED;
+						}
+					}
+					if (y + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY || board.tiles[coordsToIndex(x, y + 1)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+							sleep(1);
+							board.tiles[coordsToIndex(x, y + 1)].type = DISABLED;
+						}
+					}
+					if (y - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY || board.tiles[coordsToIndex(x, y - 1)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+							sleep(1);
+							board.tiles[coordsToIndex(x, y - 1)].type = DISABLED;
+						}
+					}
+					tileSolved++;
+					continue;
+				}
+				else if (stats.empty == 4 || stats.empty == 0)
 				{
 					continue;
 				}
-				else if (bulb + empty != 3)
+				else if (stats.bulb + stats.empty != 3)
 				{
 					break;
 				}
@@ -475,4 +613,61 @@ void lightUp(BOARD *board, int refX, int refY)
 int coordsToIndex(int x, int y)
 {
 	return x + y * BOARD_SIZE;
+}
+
+EMPTY_BULB evaluateTileSurroundings(const BOARD *board, int x, int y)
+{
+	EMPTY_BULB result = {};
+
+	result.empty = 0;
+	result.bulb = 0;
+	if (x + 1 < BOARD_SIZE)
+	{
+		TILE_TYPE t = board->tiles[coordsToIndex(x + 1, y)].type;
+		if (t == EMPTY)
+		{
+			result.empty++;
+		}
+		else if (t == BULB)
+		{
+			result.bulb++;
+		}
+	}
+	if (x - 1 >= 0)
+	{
+		TILE_TYPE t = board->tiles[coordsToIndex(x - 1, y)].type;
+		if (t == EMPTY)
+		{
+			result.empty++;
+		}
+		else if (t == BULB)
+		{
+			result.bulb++;
+		}
+	}
+	if (y + 1 < BOARD_SIZE)
+	{
+		TILE_TYPE t = board->tiles[coordsToIndex(x, y + 1)].type;
+		if (t == EMPTY)
+		{
+			result.empty++;
+		}
+		else if (t == BULB)
+		{
+			result.bulb++;
+		}
+	}
+	if (y - 1 >= 0)
+	{
+		TILE_TYPE t = board->tiles[coordsToIndex(x, y - 1)].type;
+		if (t == EMPTY)
+		{
+			result.empty++;
+		}
+		else if (t == BULB)
+		{
+			result.bulb++;
+		}
+	}
+	return result;
 }
