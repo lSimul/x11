@@ -248,8 +248,9 @@ void lightUp(BOARD *board, int refX, int refY)
 	int x = refX;
 	int y = refY;
 
-	int i = coordsToIndex(x, y);
-	board->tiles[i].type = BULB;
+	board->tiles[coordsToIndex(x, y)].type = BULB;
+
+	TILE *t = NULL;
 
 	while (1)
 	{
@@ -257,15 +258,14 @@ void lightUp(BOARD *board, int refX, int refY)
 		{
 			break;
 		}
-		int i = coordsToIndex(x, y);
-		TILE t = board->tiles[i];
-		if (t.type == BULB)
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT)
 		{
 			x--;
 		}
-		else if (t.type == EMPTY || t.type == LIGHT)
+		else if (t->type == EMPTY || t->type == DISABLED)
 		{
-			board->tiles[i].type = LIGHT;
+			t->type = LIGHT;
 			x--;
 		}
 		else
@@ -282,15 +282,14 @@ void lightUp(BOARD *board, int refX, int refY)
 		{
 			break;
 		}
-		int i = coordsToIndex(x, y);
-		TILE t = board->tiles[i];
-		if (t.type == BULB)
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT)
 		{
 			y--;
 		}
-		else if (t.type == EMPTY || t.type == LIGHT)
+		else if (t->type == EMPTY || t->type == DISABLED)
 		{
-			board->tiles[i].type = LIGHT;
+			t->type = LIGHT;
 			y--;
 		}
 		else
@@ -307,15 +306,14 @@ void lightUp(BOARD *board, int refX, int refY)
 		{
 			break;
 		}
-		int i = coordsToIndex(x, y);
-		TILE t = board->tiles[i];
-		if (t.type == BULB)
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT)
 		{
 			x++;
 		}
-		else if (t.type == EMPTY || t.type == LIGHT)
+		else if (t->type == EMPTY || t->type == DISABLED)
 		{
-			board->tiles[i].type = LIGHT;
+			t->type = LIGHT;
 			x++;
 		}
 		else
@@ -332,15 +330,14 @@ void lightUp(BOARD *board, int refX, int refY)
 		{
 			break;
 		}
-		int i = coordsToIndex(x, y);
-		TILE t = board->tiles[i];
-		if (t.type == BULB)
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT)
 		{
 			y++;
 		}
-		else if (t.type == EMPTY || t.type == LIGHT)
+		else if (t->type == EMPTY || t->type == DISABLED)
 		{
-			board->tiles[i].type = LIGHT;
+			t->type = LIGHT;
 			y++;
 		}
 		else
