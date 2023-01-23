@@ -59,6 +59,8 @@ int coordsToIndex(int refX, int refY);
 
 EMPTY_BULB evaluateTileSurroundings(const BOARD *board, int x, int y);
 
+void disableTilesAboveLimit(X_INSTANCE *instance, BOARD *board, int x, int y, int coordX, int coordY);
+
 int orderTiles(const void *l, const void *r)
 {
 	const TILE *tl = l;
@@ -146,26 +148,7 @@ int main()
 
 		if (board.tiles[i].type == VALUE_0)
 		{
-			if (x + 1 < BOARD_SIZE)
-			{
-				moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
-				sleep(1);
-			}
-			if (x - 1 >= 0)
-			{
-				moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
-				sleep(1);
-			}
-			if (y + 1 < BOARD_SIZE)
-			{
-				moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
-				sleep(1);
-			}
-			if (y - 1 >= 0)
-			{
-				moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
-				sleep(1);
-			}
+			disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
 		}
 		else if (board.tiles[i].type == VALUE_4)
 		{
@@ -223,48 +206,12 @@ int main()
 			{
 				if (stats.bulb == 1 && stats.empty > 0)
 				{
-					if (x + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY || board.tiles[coordsToIndex(x + 1, y)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
-							sleep(1);
-							board.tiles[coordsToIndex(x + 1, y)].type = DISABLED;
-						}
-					}
-					if (x - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY || board.tiles[coordsToIndex(x - 1, y)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
-							sleep(1);
-							board.tiles[coordsToIndex(x - 1, y)].type = DISABLED;
-						}
-					}
-					if (y + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY || board.tiles[coordsToIndex(x, y + 1)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
-							sleep(1);
-							board.tiles[coordsToIndex(x, y + 1)].type = DISABLED;
-						}
-					}
-					if (y - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY || board.tiles[coordsToIndex(x, y - 1)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
-							sleep(1);
-							board.tiles[coordsToIndex(x, y - 1)].type = DISABLED;
-						}
-					}
+					disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
 					tileSolved++;
 					continue;
 				}
 				else if (stats.empty == 1)
 				{
-
 					if (x + 1 < BOARD_SIZE)
 					{
 						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY)
@@ -311,85 +258,13 @@ int main()
 			{
 				if (stats.bulb == 2)
 				{
-					if (x + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY || board.tiles[coordsToIndex(x + 1, y)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
-							sleep(1);
-							board.tiles[coordsToIndex(x + 1, y)].type = DISABLED;
-						}
-					}
-					if (x - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY || board.tiles[coordsToIndex(x - 1, y)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
-							sleep(1);
-							board.tiles[coordsToIndex(x - 1, y)].type = DISABLED;
-						}
-					}
-					if (y + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY || board.tiles[coordsToIndex(x, y + 1)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
-							sleep(1);
-							board.tiles[coordsToIndex(x, y + 1)].type = DISABLED;
-						}
-					}
-					if (y - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY || board.tiles[coordsToIndex(x, y - 1)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
-							sleep(1);
-							board.tiles[coordsToIndex(x, y - 1)].type = DISABLED;
-						}
-					}
+					disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
 					tileSolved++;
 					continue;
 				}
 				else if (stats.bulb + stats.empty == 2)
 				{
-					if (x + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY)
-						{
-							moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
-							sleep(1);
-							lightUp(&board, x + 1, y);
-						}
-					}
-					if (x - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY)
-						{
-							moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
-							sleep(1);
-							lightUp(&board, x - 1, y);
-						}
-					}
-					if (y + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY)
-						{
-
-							moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
-							sleep(1);
-							lightUp(&board, x, y + 1);
-						}
-					}
-					if (y - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY)
-						{
-
-							moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
-							sleep(1);
-							lightUp(&board, x, y - 1);
-						}
-					}
+					disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
 					tileSolved++;
 					continue;
 				}
@@ -398,42 +273,7 @@ int main()
 			{
 				if (stats.bulb == 3)
 				{
-					if (x + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY || board.tiles[coordsToIndex(x + 1, y)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
-							sleep(1);
-							board.tiles[coordsToIndex(x + 1, y)].type = DISABLED;
-						}
-					}
-					if (x - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY || board.tiles[coordsToIndex(x - 1, y)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
-							sleep(1);
-							board.tiles[coordsToIndex(x - 1, y)].type = DISABLED;
-						}
-					}
-					if (y + 1 < BOARD_SIZE)
-					{
-						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY || board.tiles[coordsToIndex(x, y + 1)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
-							sleep(1);
-							board.tiles[coordsToIndex(x, y + 1)].type = DISABLED;
-						}
-					}
-					if (y - 1 >= 0)
-					{
-						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY || board.tiles[coordsToIndex(x, y - 1)].type == LIGHT)
-						{
-							moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
-							sleep(1);
-							board.tiles[coordsToIndex(x, y - 1)].type = DISABLED;
-						}
-					}
+					disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
 					tileSolved++;
 					continue;
 				}
@@ -670,4 +510,46 @@ EMPTY_BULB evaluateTileSurroundings(const BOARD *board, int x, int y)
 		}
 	}
 	return result;
+}
+
+void disableTilesAboveLimit(X_INSTANCE *instance, BOARD *board, int x, int y, int coordX, int coordY)
+{
+	if (x + 1 < BOARD_SIZE)
+	{
+		if (board->tiles[coordsToIndex(x + 1, y)].type == EMPTY)
+		{
+			moveAndClick(instance->display, &instance->window, coordX + TILE_SIZE, coordY);
+			sleep(1);
+			lightUp(board, x + 1, y);
+		}
+	}
+	if (x - 1 >= 0)
+	{
+		if (board->tiles[coordsToIndex(x - 1, y)].type == EMPTY)
+		{
+			moveAndClick(instance->display, &instance->window, coordX - TILE_SIZE, coordY);
+			sleep(1);
+			lightUp(board, x - 1, y);
+		}
+	}
+	if (y + 1 < BOARD_SIZE)
+	{
+		if (board->tiles[coordsToIndex(x, y + 1)].type == EMPTY)
+		{
+
+			moveAndClick(instance->display, &instance->window, coordX, coordY + TILE_SIZE);
+			sleep(1);
+			lightUp(board, x, y + 1);
+		}
+	}
+	if (y - 1 >= 0)
+	{
+		if (board->tiles[coordsToIndex(x, y - 1)].type == EMPTY)
+		{
+
+			moveAndClick(instance->display, &instance->window, coordX, coordY - TILE_SIZE);
+			sleep(1);
+			lightUp(board, x, y - 1);
+		}
+	}
 }
