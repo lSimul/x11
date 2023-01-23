@@ -1,6 +1,7 @@
 #include "common.h"
 #include "file.h"
 #include "image.h"
+#include "movement.h"
 
 #define OPTIONS 7
 
@@ -117,6 +118,24 @@ int main()
 	for (int i = 0; i < board.size; i++)
 	{
 		printf("X: %d\nY: %d\nT: %d\n\n", board.tiles[i].x, board.tiles[i].y, board.tiles[i].type);
+	}
+
+	// Very naive approach.
+	for (int i = 0; i < board.size; i++)
+	{
+		if (board.tiles[i].type == VALUE_4)
+		{
+			int coordX = board.tiles[i].x;
+			int coordY = board.tiles[i].y;
+
+			coordX += TILE_SIZE / 2;
+			coordY += TILE_SIZE / 2;
+			moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+			moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+
+			moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+			moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+		}
 	}
 
 	free(board.tiles);

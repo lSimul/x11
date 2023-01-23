@@ -6,7 +6,7 @@ all: command_reader light_up
 command_reader: command_reader.c grammer.o file.o string.o command.o token.o keys.o movement.o image.o
 	$(C) $^ $(LIBS) -lXtst -o $@
 
-light_up: light_up.c file.o image.o
+light_up: light_up.c file.o image.o movement.o
 	$(C) $^ $(LIBS) -lXtst -o $@
 
 grammer.o: grammer.c grammer.h
