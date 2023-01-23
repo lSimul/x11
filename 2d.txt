@@ -1,0 +1,3 @@
+FIND images/xubuntu.bmp
+MOVE MOUSE
+CLICK
