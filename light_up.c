@@ -177,40 +177,15 @@ int main()
 
 			EMPTY_BULB stats = evaluateTileSurroundings(&board, x, y);
 
-			if (board.tiles[i].type == VALUE_1)
+			TILE_TYPE t = board.tiles[i].type;
+			if (t == VALUE_1 || t == VALUE_2 || t == VALUE_3)
 			{
-				if (stats.bulb == 1 && stats.empty > 0)
+				if (stats.bulb == t && stats.empty > 0)
 				{
 					disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
 					tileSolved++;
 				}
-				else if (stats.bulb + stats.empty == 1 && stats.bulb < 1)
-				{
-					lightUpSurroundingTilesIfAble(&instance, &board, x, y, coordX, coordY);
-					tileSolved++;
-				}
-			}
-			else if (board.tiles[i].type == VALUE_2)
-			{
-				if (stats.bulb == 2 && stats.empty > 0)
-				{
-					disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
-					tileSolved++;
-				}
-				else if (stats.bulb + stats.empty == 2 && stats.bulb < 2)
-				{
-					lightUpSurroundingTilesIfAble(&instance, &board, x, y, coordX, coordY);
-					tileSolved++;
-				}
-			}
-			else if (board.tiles[i].type == VALUE_3)
-			{
-				if (stats.bulb == 3 && stats.empty > 0)
-				{
-					disableTilesAboveLimit(&instance, &board, x, y, coordX, coordY);
-					tileSolved++;
-				}
-				else if (stats.bulb + stats.empty == 3 && stats.bulb < 3)
+				else if (stats.bulb + stats.empty == t && stats.bulb < t)
 				{
 					lightUpSurroundingTilesIfAble(&instance, &board, x, y, coordX, coordY);
 					tileSolved++;
