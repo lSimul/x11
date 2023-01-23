@@ -262,10 +262,41 @@ int main()
 					}
 				}
 
-				printf("%d + %d = %d\n", bulb, empty, bulb + empty);
-
 				if (bulb == 3)
 				{
+					if (x + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY || board.tiles[coordsToIndex(x + 1, y)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+							sleep(1);
+						}
+					}
+					if (x - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY || board.tiles[coordsToIndex(x - 1, y)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+							sleep(1);
+						}
+					}
+					if (y + 1 < BOARD_SIZE)
+					{
+						if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY || board.tiles[coordsToIndex(x, y + 1)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+							sleep(1);
+						}
+					}
+					if (y - 1 >= 0)
+					{
+						if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY || board.tiles[coordsToIndex(x, y - 1)].type == LIGHT)
+						{
+							moveAndRightClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+							sleep(1);
+						}
+					}
+
 					continue;
 				}
 				else if (empty == 4 || empty == 0)
@@ -274,7 +305,7 @@ int main()
 				}
 				else if (bulb + empty != 3)
 				{
-					continue;
+					break;
 				}
 
 				if (x + 1 < BOARD_SIZE)
