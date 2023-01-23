@@ -27,11 +27,13 @@ int click(Display *display);
  *
  * Code is terrible, but it shows the way, how to use absolute positioning.
  *
+ * @param display
+ * @param window
  * @param x
  * @param y
  * @return
  */
-int mouseMove(Display *display, Window *root, int x, int y);
+int mouseMove(Display *display, Window *window, int x, int y);
 
 /**
  * @brief
@@ -40,20 +42,32 @@ int mouseMove(Display *display, Window *root, int x, int y);
  * https://stackoverflow.com/questions/8767524/how-do-we-simulate-a-mouse-click-with-xlib-c
  *
  * @param display
- * @param root
+ * @param window
  * @param x
  * @param y
  * @return int
  */
-int moveAndClick(Display *display, Window *root, int x, int y);
+int moveAndClick(Display *display, Window *window, int x, int y);
 
 /**
  * @brief
  *
  * @param display
- * @param root
+ * @param window
  * @param x
  * @param y
  * @return int
  */
-int moveAndRightClick(Display *display, Window *root, int x, int y);
+int moveAndRightClick(Display *display, Window *window, int x, int y);
+
+/**
+ * @brief
+ *
+ * @param display
+ * @param window
+ * @param x
+ * @param y
+ * @param button
+ * @return int
+ */
+int moveAndClickInner(Display *display, Window *window, int x, int y, int button);
