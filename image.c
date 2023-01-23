@@ -4,9 +4,39 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/XTest.h>
 
-int findAllImages(COORDS *result, BITMAP *needle, X_INSTANCE *instance)
+COORDS *findAllImages(int *count, BITMAP *needle, X_INSTANCE *instance)
 {
-	return findImage(result, needle, instance);
+	// I will go just with the idea of the find complex image.
+	// Code will be duplicated, I really do not want to be bothered with deduping.
+	// TODO: Dedupe.
+	// TODO: Change the interface, maybe struct, same idea as string and others?
+
+	XImage *haystack = XGetImage(instance->display, instance->window, 0, 0, instance->attrs.width, instance->attrs.height, AllPlanes, ZPixmap);
+
+	COORDS *result = malloc(10 * sizeof(*result));
+
+	for (int y = 0; y < haystack->height; y++)
+	{
+		for (int x = 0; x < haystack->width; x++)
+		{
+			unsigned long pixel = XGetPixel(haystack, x, y);
+			if (comparePixel(haystack, needle->data[0], pixel))
+			{
+				if (x + needle->width > instance->attrs.width || y + needle->height > instance->attrs.height)
+				{
+					continue;
+				}
+
+				if (!findComplexImageInner(needle, haystack, x, y))
+				{
+					result[*count].x = x;
+					result[*count].y = y;
+					(*count)++;
+				}
+			}
+		}
+	}
+	return result;
 }
 
 int findImage(COORDS *result, BITMAP *needle, X_INSTANCE *instance)
@@ -59,8 +89,10 @@ int findComplexImage(COORDS *result, BITMAP *needle, XImage *haystack, X_INSTANC
 					continue;
 				}
 
-				if (!findComplexImageInner(result, needle, haystack, x, y))
+				if (!findComplexImageInner(needle, haystack, x, y))
 				{
+					result->x = x;
+					result->y = y;
 					return 0;
 				}
 			}
@@ -69,14 +101,14 @@ int findComplexImage(COORDS *result, BITMAP *needle, XImage *haystack, X_INSTANC
 	return 1;
 }
 
-int findComplexImageInner(COORDS *result, BITMAP *needle, XImage *haystack, int offsetX, int offsetY)
+int findComplexImageInner(BITMAP *needle, XImage *haystack, int offsetX, int offsetY)
 {
 	for (int y = 0; y < needle->height; y++)
 	{
 		for (int x = 0; x < needle->width; x++)
 		{
 			unsigned long pixel = XGetPixel(haystack, x + offsetX, y + offsetY);
-			if (!comparePixel(haystack, needle->data[x + y], pixel))
+			if (!comparePixel(haystack, needle->data[x + y * needle->width], pixel))
 			{
 				return 1;
 			}

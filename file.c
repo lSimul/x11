@@ -61,12 +61,30 @@ int parseBitmap(BITMAP *bitmap, unsigned char *buffer, int length)
 	bitmap->height += buffer[25] << 24;
 
 	int pos = 0;
-	for (int i = start; i < end; i += 4)
+
+	// TODO: Be more effective. I can store it by chunks size of |width|.
+	//
+	// Lazy way of transforming how the image is stored:
+	// bottom left to top right -> top left to bottom right,
 	{
-		bitmap->data[pos].red = buffer[i + 2];
-		bitmap->data[pos].green = buffer[i + 1];
-		bitmap->data[pos].blue = buffer[i];
-		pos++;
+		PIXEL *pixels = malloc(bitmap->size * sizeof(*pixels));
+		for (int i = start; i < end; i += 4)
+		{
+			pixels[pos].red = buffer[i + 2];
+			pixels[pos].green = buffer[i + 1];
+			pixels[pos].blue = buffer[i];
+			pos++;
+		}
+		int row = bitmap->height - 1;
+		for (int y = 0; y < bitmap->height; y++)
+		{
+			for (int x = 0; x < bitmap->width; x++)
+			{
+				bitmap->data[row * bitmap->width + x] = pixels[y * bitmap->width + x];
+			}
+			row--;
+		}
+		free(pixels);
 	}
 
 	return 0;
@@ -125,7 +143,6 @@ char getChar(READER *reader)
 
 	return EOF;
 }
-
 
 void ungetChar(READER *reader, char c)
 {

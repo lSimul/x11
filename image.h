@@ -4,12 +4,12 @@
 /**
  * @brief
  *
- * @param result
+ * @param count
  * @param needle
  * @param instance
- * @return int
+ * @return COORDS*
  */
-int findAllImages(COORDS *result, BITMAP *needle, X_INSTANCE *instance);
+COORDS *findAllImages(int *count, BITMAP *needle, X_INSTANCE *instance);
 
 /**
  * @brief
@@ -68,14 +68,13 @@ int findComplexImage(COORDS *result, BITMAP *needle, XImage *haystack, X_INSTANC
  * Uses the same idea as the findImageRow, but the tides are turned, reference is a haystack, not
  * a needle.
  *
- * @param result
  * @param needle
  * @param haystack
  * @param offsetX
  * @param offsetY
  * @return int
  */
-int findComplexImageInner(COORDS *result, BITMAP *needle, XImage *haystack, int offsetX, int offsetY);
+int findComplexImageInner(BITMAP *needle, XImage *haystack, int offsetX, int offsetY);
 
 /**
  * @brief
