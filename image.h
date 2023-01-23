@@ -4,6 +4,16 @@
 /**
  * @brief
  *
+ * @param result
+ * @param needle
+ * @param instance
+ * @return int
+ */
+int findAllImages(COORDS *result, BITMAP *needle, X_INSTANCE *instance);
+
+/**
+ * @brief
+ *
  * Main source of screen managing:
  *
  * https://stackoverflow.com/questions/8249669/how-do-take-a-screenshot-correctly-with-xlib

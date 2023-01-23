@@ -4,6 +4,11 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/XTest.h>
 
+int findAllImages(COORDS *result, BITMAP *needle, X_INSTANCE *instance)
+{
+	return findImage(result, needle, instance);
+}
+
 int findImage(COORDS *result, BITMAP *needle, X_INSTANCE *instance)
 {
 	XImage *haystack = XGetImage(instance->display, instance->window, 0, 0, instance->attrs.width, instance->attrs.height, AllPlanes, ZPixmap);

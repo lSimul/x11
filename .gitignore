@@ -1,4 +1,5 @@
 *.o
 command_reader
+light_up
 _*
 html/*
