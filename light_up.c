@@ -163,26 +163,28 @@ int main()
 		{
 			moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
 			sleep(1);
-			lightUp(&board, x, y);
+			lightUp(&board, x + 1, y);
 
 			moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
 			sleep(1);
-			lightUp(&board, x, y);
+			lightUp(&board, x - 1, y);
 
 			moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
 			sleep(1);
-			lightUp(&board, x, y);
+			lightUp(&board, x, y + 1);
 
 			moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
 			sleep(1);
-			lightUp(&board, x, y);
+			lightUp(&board, x, y - 1);
 		}
 	}
 
 	char end = 0;
+	char tileSolved = 0;
 	while (1)
 	{
 		end = 0;
+		tileSolved = 0;
 		for (int i = 0; i < board.size; i++)
 		{
 			if (board.tiles[i].type == EMPTY)
@@ -198,7 +200,6 @@ int main()
 
 		for (int i = 0; i < board.size; i++)
 		{
-
 			int x = i % BOARD_SIZE;
 			int y = (i - i % BOARD_SIZE) / BOARD_SIZE;
 
@@ -207,7 +208,121 @@ int main()
 
 			coordX += TILE_SIZE / 2;
 			coordY += TILE_SIZE / 2;
+
+			if (board.tiles[i].type == VALUE_3)
+			{
+				char empty = 0;
+				char bulb = 0;
+				if (x + 1 < BOARD_SIZE)
+				{
+					TILE_TYPE t = board.tiles[coordsToIndex(x + 1, y)].type;
+					if (t == EMPTY)
+					{
+						empty++;
+					}
+					else if (t == BULB)
+					{
+						bulb++;
+					}
+				}
+				if (x - 1 >= 0)
+				{
+					TILE_TYPE t = board.tiles[coordsToIndex(x - 1, y)].type;
+					if (t == EMPTY)
+					{
+						empty++;
+					}
+					else if (t == BULB)
+					{
+						bulb++;
+					}
+				}
+				if (y + 1 < BOARD_SIZE)
+				{
+					TILE_TYPE t = board.tiles[coordsToIndex(x, y + 1)].type;
+					if (t == EMPTY)
+					{
+						empty++;
+					}
+					else if (t == BULB)
+					{
+						bulb++;
+					}
+				}
+				if (y - 1 >= 0)
+				{
+					TILE_TYPE t = board.tiles[coordsToIndex(x, y - 1)].type;
+					if (t == EMPTY)
+					{
+						empty++;
+					}
+					else if (t == BULB)
+					{
+						bulb++;
+					}
+				}
+
+				printf("%d + %d = %d\n", bulb, empty, bulb + empty);
+
+				if (bulb == 3)
+				{
+					continue;
+				}
+				else if (empty == 4 || empty == 0)
+				{
+					continue;
+				}
+				else if (bulb + empty != 3)
+				{
+					continue;
+				}
+
+				if (x + 1 < BOARD_SIZE)
+				{
+					if (board.tiles[coordsToIndex(x + 1, y)].type == EMPTY)
+					{
+						moveAndClick(instance.display, &instance.window, coordX + TILE_SIZE, coordY);
+						sleep(1);
+						lightUp(&board, x + 1, y);
+					}
+				}
+				if (x - 1 >= 0)
+				{
+					if (board.tiles[coordsToIndex(x - 1, y)].type == EMPTY)
+					{
+						moveAndClick(instance.display, &instance.window, coordX - TILE_SIZE, coordY);
+						sleep(1);
+						lightUp(&board, x - 1, y);
+					}
+				}
+				if (y + 1 < BOARD_SIZE)
+				{
+					if (board.tiles[coordsToIndex(x, y + 1)].type == EMPTY)
+					{
+
+						moveAndClick(instance.display, &instance.window, coordX, coordY + TILE_SIZE);
+						sleep(1);
+						lightUp(&board, x, y + 1);
+					}
+				}
+				if (y - 1 >= 0)
+				{
+					if (board.tiles[coordsToIndex(x, y - 1)].type == EMPTY)
+					{
+
+						moveAndClick(instance.display, &instance.window, coordX, coordY - TILE_SIZE);
+						sleep(1);
+						lightUp(&board, x, y - 1);
+					}
+				}
+				tileSolved++;
+			}
 		}
+		if (tileSolved)
+		{
+			continue;
+		}
+
 		printf("Everything is not resolved.");
 		break;
 	}
@@ -219,6 +334,10 @@ void lightUp(BOARD *board, int refX, int refY)
 {
 	int x = refX;
 	int y = refY;
+
+	int i = coordsToIndex(x, y);
+	board->tiles[i].type = BULB;
+
 	while (1)
 	{
 		if (x >= BOARD_SIZE || x < 0 || y >= BOARD_SIZE || y < 0)
@@ -227,7 +346,11 @@ void lightUp(BOARD *board, int refX, int refY)
 		}
 		int i = coordsToIndex(x, y);
 		TILE t = board->tiles[i];
-		if (t.type == EMPTY || t.type == LIGHT)
+		if (t.type == BULB)
+		{
+			x--;
+		}
+		else if (t.type == EMPTY || t.type == LIGHT)
 		{
 			t.type = LIGHT;
 			x--;
@@ -249,7 +372,11 @@ void lightUp(BOARD *board, int refX, int refY)
 		}
 		int i = coordsToIndex(x, y);
 		TILE t = board->tiles[i];
-		if (t.type == EMPTY || t.type == LIGHT)
+		if (t.type == BULB)
+		{
+			y--;
+		}
+		else if (t.type == EMPTY || t.type == LIGHT)
 		{
 			t.type = LIGHT;
 			y--;
@@ -271,7 +398,11 @@ void lightUp(BOARD *board, int refX, int refY)
 		}
 		int i = coordsToIndex(x, y);
 		TILE t = board->tiles[i];
-		if (t.type == EMPTY || t.type == LIGHT)
+		if (t.type == BULB)
+		{
+			x++;
+		}
+		else if (t.type == EMPTY || t.type == LIGHT)
 		{
 			t.type = LIGHT;
 			x++;
@@ -293,7 +424,11 @@ void lightUp(BOARD *board, int refX, int refY)
 		}
 		int i = coordsToIndex(x, y);
 		TILE t = board->tiles[i];
-		if (t.type == EMPTY || t.type == LIGHT)
+		if (t.type == BULB)
+		{
+			y++;
+		}
+		else if (t.type == EMPTY || t.type == LIGHT)
 		{
 			t.type = LIGHT;
 			y++;
