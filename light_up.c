@@ -101,6 +101,32 @@ int main()
 	instance.window = XDefaultRootWindow(instance.display);
 	XGetWindowAttributes(instance.display, instance.window, &instance.attrs);
 
+	// Just by screenshotting I was able to create
+	// three files which are different. One of them is (surely) a game start.
+	const char *gameStarts[3] = {
+		"images/game_start_oof_1.bmp",
+		"images/game_start_oof_2.bmp",
+		"images/game_start_oof_3.bmp",
+	};
+	for (int i = 0; i < 3; i++)
+	{
+		BITMAP bitmap = {};
+		if (readBitmap(&bitmap, gameStarts[i]))
+		{
+			printf("Fail while reading '%s'.\n", gameStarts[i]);
+			continue;
+		}
+
+		COORDS coords = {};
+		if (!findImage(&coords, &bitmap, &instance))
+		{
+			// +15 to center it, image is 30x30
+			moveAndClick(instance.display, &instance.window, coords.x + 15, coords.y + 15);
+			sleep(1);
+			break;
+		}
+	}
+
 	BOARD board = {};
 	// I will start with 7x7 puzzle only.
 	board.height = board.width = BOARD_SIZE;
