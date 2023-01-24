@@ -63,7 +63,7 @@ void lightUpSurroundingTilesIfAble(X_INSTANCE *instance, BOARD *board, int x, in
 
 void disableTilesAboveLimit(X_INSTANCE *instance, BOARD *board, int x, int y, int coordX, int coordY);
 
-int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int refY);
+int findEmptyTiles(const BOARD *board, COORDS *firstOccurrence, int refX, int refY);
 
 int orderTiles(const void *l, const void *r)
 {
@@ -529,7 +529,7 @@ void disableTilesAboveLimit(X_INSTANCE *instance, BOARD *board, int x, int y, in
 	}
 }
 
-int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int refY)
+int findEmptyTiles(const BOARD *board, COORDS *firstOccurrence, int refX, int refY)
 {
 	int result = 0;
 
@@ -551,8 +551,8 @@ int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int ref
 		}
 		else if (t->type == EMPTY)
 		{
-			firstOccurence->x = x;
-			firstOccurence->y = y;
+			firstOccurrence->x = x;
+			firstOccurrence->y = y;
 			result++;
 
 			x--;
@@ -578,8 +578,8 @@ int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int ref
 		}
 		else if (t->type == EMPTY)
 		{
-			firstOccurence->x = x;
-			firstOccurence->y = y;
+			firstOccurrence->x = x;
+			firstOccurrence->y = y;
 			result++;
 
 			y--;
@@ -605,8 +605,8 @@ int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int ref
 		}
 		else if (t->type == EMPTY)
 		{
-			firstOccurence->x = x;
-			firstOccurence->y = y;
+			firstOccurrence->x = x;
+			firstOccurrence->y = y;
 			result++;
 
 			x++;
@@ -632,8 +632,8 @@ int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int ref
 		}
 		else if (t->type == EMPTY)
 		{
-			firstOccurence->x = x;
-			firstOccurence->y = y;
+			firstOccurrence->x = x;
+			firstOccurrence->y = y;
 			result++;
 
 			y++;
