@@ -63,6 +63,8 @@ void lightUpSurroundingTilesIfAble(X_INSTANCE *instance, BOARD *board, int x, in
 
 void disableTilesAboveLimit(X_INSTANCE *instance, BOARD *board, int x, int y, int coordX, int coordY);
 
+int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int refY);
+
 int orderTiles(const void *l, const void *r)
 {
 	const TILE *tl = l;
@@ -191,6 +193,43 @@ int main()
 					tileSolved++;
 				}
 			}
+			// These two options are similar, almost symmetrical.
+			else if (t == EMPTY)
+			{
+				// Goal is to check if this is the only empty tile around. If yes, this tile can be lighten up only by this tile.
+				COORDS c = {};
+				int result = findEmptyTiles(&board, &c, x, y);
+
+				if (result == 0)
+				{
+					moveAndClick(instance.display, &instance.window, coordX, coordY);
+					sleep(1);
+					lightUp(&board, x, y);
+					tileSolved++;
+				}
+			}
+			else if (t == DISABLED)
+			{
+				// Looks around the tiles. If only one empty tile is found, light has to be turned on „there“.
+				// Otherwise it does not have a solution.
+				COORDS c = {};
+				int result = findEmptyTiles(&board, &c, x, y);
+
+				if (result == 1)
+				{
+					TILE t = board.tiles[coordsToIndex(c.x, c.y)];
+
+					int coordX = t.x;
+					int coordY = t.y;
+					coordX += TILE_SIZE / 2;
+					coordY += TILE_SIZE / 2;
+
+					moveAndClick(instance.display, &instance.window, coordX, coordY);
+					sleep(1);
+					lightUp(&board, c.x, c.y);
+					tileSolved++;
+				}
+			}
 		}
 		if (tileSolved)
 		{
@@ -205,37 +244,6 @@ int main()
 				end++;
 			}
 		}
-
-		if (end == 1)
-		{
-			for (int i = 0; i < board.size; i++)
-			{
-				if (board.tiles[i].type == EMPTY)
-				{
-					int x = i % BOARD_SIZE;
-					int y = (i - i % BOARD_SIZE) / BOARD_SIZE;
-
-					int coordX = board.tiles[i].x;
-					int coordY = board.tiles[i].y;
-
-					coordX += TILE_SIZE / 2;
-					coordY += TILE_SIZE / 2;
-
-					moveAndClick(instance.display, &instance.window, coordX, coordY);
-					sleep(1);
-					lightUp(&board, x, y);
-					end = 0;
-					break;
-				}
-			}
-			break;
-		}
-		else if (end == 0)
-		{
-			break;
-		}
-
-		printf("Everything is not resolved.");
 		break;
 	}
 	printf("Just %d tiles has to be lighten up.\n", end);
@@ -493,4 +501,123 @@ void disableTilesAboveLimit(X_INSTANCE *instance, BOARD *board, int x, int y, in
 			t->type = DISABLED;
 		}
 	}
+}
+
+int findEmptyTiles(const BOARD *board, COORDS *firstOccurence, int refX, int refY)
+{
+	int result = 0;
+
+	TILE *t = NULL;
+
+	int x = refX - 1;
+	int y = refY;
+
+	while (1)
+	{
+		if (x < 0)
+		{
+			break;
+		}
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT || t->type == DISABLED)
+		{
+			x--;
+		}
+		else if (t->type == EMPTY)
+		{
+			firstOccurence->x = x;
+			firstOccurence->y = y;
+			result++;
+
+			x--;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	x = refX;
+	y = refY - 1;
+	while (1)
+	{
+		if (y < 0)
+		{
+			break;
+		}
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT || t->type == DISABLED)
+		{
+			y--;
+		}
+		else if (t->type == EMPTY)
+		{
+			firstOccurence->x = x;
+			firstOccurence->y = y;
+			result++;
+
+			y--;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	x = refX + 1;
+	y = refY;
+	while (1)
+	{
+		if (x >= BOARD_SIZE)
+		{
+			break;
+		}
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT || t->type == DISABLED)
+		{
+			x++;
+		}
+		else if (t->type == EMPTY)
+		{
+			firstOccurence->x = x;
+			firstOccurence->y = y;
+			result++;
+
+			x++;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	x = refX;
+	y = refY + 1;
+	while (1)
+	{
+		if (y >= BOARD_SIZE)
+		{
+			break;
+		}
+		t = &board->tiles[coordsToIndex(x, y)];
+		if (t->type == BULB || t->type == LIGHT || t->type == DISABLED)
+		{
+			y++;
+		}
+		else if (t->type == EMPTY)
+		{
+			firstOccurence->x = x;
+			firstOccurence->y = y;
+			result++;
+
+			y++;
+		}
+		else
+		{
+
+			break;
+		}
+	}
+
+	return result;
 }
